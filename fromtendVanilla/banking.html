@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      }
+
+      .logo {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-menu li a {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-menu li a:hover,
+      .nav-menu li a.active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .user-info {
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      /* Login Form */
+      .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-title {
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        color: white;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: none;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .form-control:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      }
+
+      .btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 100%;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+        color: white;
+      }
+
+      /* Dashboard */
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        color: white;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .card-icon {
+        font-size: 1.5rem;
+        opacity: 0.8;
+      }
+
+      .balance {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 1rem 0;
+      }
+
+      .account-number {
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      /* Table */
+      .table-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        overflow-x: auto;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        color: white;
+      }
+
+      .table th,
+      .table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .table th {
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .table tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Status badges */
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .status-completed {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+      }
+
+      .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+      }
+
+      .status-failed {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+      }
+
+      .modal.show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        color: white;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .close {
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+
+      /* Error messages */
+      .error-message {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      .success-message {
+        color: #51cf66;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      /* Loading spinner */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+
+        .nav-menu {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .dashboard {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 10px;
+        }
+      }
+
+      /* Hide sections initially */
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Login Section -->
+      <div id="loginSection" class="section active">
+        <div class="login-container">
+          <div class="login-card">
+            <h2 class="login-title">
+              <i class="fas fa-university"></i> SecureBank
+            </h2>
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  class="form-control"
+                  placeholder="Enter your username"
+                  required
+                />
+                <div class="error-message" id="usernameError"></div>
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  class="form-control"
+                  placeholder="Enter your password"
+                  required
+                />
+                <div class="error-message" id="passwordError"></div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <span
+                  id="loginSpinner"
+                  class="loading"
+                  style="display: none"
+                ></span>
+                <span id="loginText">Sign In</span>
+              </button>
+              <div class="error-message" id="loginError"></div>
+              <div class="success-message" id="loginSuccess"></div>
+            </form>
+            <div style="text-align: center; margin-top: 2rem">
+              <a
+                href="#"
+                id="showRegister"
+                style="color: rgba(255, 255, 255, 0.8)"
+                >Don't have an account? Register</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Section -->
+      <div id="registerSection" class="section">
+        <div class="login-container">
+          <div class="login-card">
+            <h2 class="login-title">
+              <i class="fas fa-user-plus"></i> Create Account
+            </h2>
+            <form id="registerForm">
+              <div class="form-group">
+                <label for="regUsername">Username</label>
+                <input
+                  type="text"
+                  id="regUsername"
+                  class="form-control"
+                  placeholder="Choose a username"
+                  required
+                />
+                <div class="error-message" id="regUsernameError"></div>
+              </div>
+              <div class="form-group">
+                <label for="regEmail">Email</label>
+                <input
+                  type="email"
+                  id="regEmail"
+                  class="form-control"
+                  placeholder="Enter your email"
+                  required
+                />
+                <div class="error-message" id="regEmailError"></div>
+              </div>
+              <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input
+                  type="password"
+                  id="regPassword"
+                  class="form-control"
+                  placeholder="Create a password"
+                  required
+                />
+                <div class="error-message" id="regPasswordError"></div>
+              </div>
+              <div class="form-group">
+                <label for="regFirstName">First Name</label>
+                <input
+                  type="text"
+                  id="regFirstName"
+                  class="form-control"
+                  placeholder="Enter your first name"
+                  required
+                />
+                <div class="error-message" id="regFirstNameError"></div>
+              </div>
+              <div class="form-group">
+                <label for="regLastName">Last Name</label>
+                <input
+                  type="text"
+                  id="regLastName"
+                  class="form-control"
+                  placeholder="Enter your last name"
+                  required
+                />
+                <div class="error-message" id="regLastNameError"></div>
+              </div>
+              <div class="form-group">
+                <label for="regPhone">Phone Number</label>
+                <input
+                  type="tel"
+                  id="regPhone"
+                  class="form-control"
+                  placeholder="Enter your phone number"
+                />
+                <div class="error-message" id="regPhoneError"></div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <span
+                  id="registerSpinner"
+                  class="loading"
+                  style="display: none"
+                ></span>
+                <span id="registerText">Create Account</span>
+              </button>
+              <div class="error-message" id="registerError"></div>
+              <div class="success-message" id="registerSuccess"></div>
+            </form>
+            <div style="text-align: center; margin-top: 2rem">
+              <a href="#" id="showLogin" style="color: rgba(255, 255, 255, 0.8)"
+                >Already have an account? Sign In</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Application -->
+      <div id="mainSection" class="section">
+        <!-- Header -->
+        <header class="header">
+          <div class="logo"><i class="fas fa-university"></i> SecureBank</div>
+          <nav>
+            <ul class="nav-menu">
+              <li>
+                <a href="#" class="nav-link active" data-section="dashboard"
+                  ><i class="fas fa-home"></i> Dashboard</a
+                >
+              </li>
+              <li>
+                <a href="#" class="nav-link" data-section="accounts"
+                  ><i class="fas fa-wallet"></i> Accounts</a
+                >
+              </li>
+              <li>
+                <a href="#" class="nav-link" data-section="transactions"
+                  ><i class="fas fa-exchange-alt"></i> Transactions</a
+                >
+              </li>
+              <li>
+                <a href="#" class="nav-link" data-section="transfer"
+                  ><i class="fas fa-paper-plane"></i> Transfer</a
+                >
+              </li>
+            </ul>
+          </nav>
+          <div class="user-info">
+            <span id="userWelcome">Welcome, User</span>
+            <button class="btn btn-secondary" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </header>
+
+        <div class="container">
+          <!-- Dashboard Section -->
+          <div id="dashboardContent" class="content-section active">
+            <div class="dashboard" id="accountsGrid">
+              <!-- Account cards will be populated here -->
+            </div>
+
+            <div class="table-container">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-history"></i> Recent Transactions
+                </h3>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactions">
+                  <!-- Recent transactions will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Accounts Section -->
+          <div id="accountsContent" class="content-section">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-plus"></i> Create New Account
+                </h3>
+              </div>
+              <form id="createAccountForm">
+                <div class="form-group">
+                  <label for="accountType">Account Type</label>
+                  <select id="accountType" class="form-control" required>
+                    <option value="">Select Account Type</option>
+                    <option value="SAVINGS">Savings Account</option>
+                    <option value="CHECKING">Checking Account</option>
+                    <option value="BUSINESS">Business Account</option>
+                    <option value="FIXED_DEPOSIT">Fixed Deposit</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="dailyLimit">Daily Limit</label>
+                  <input
+                    type="number"
+                    id="dailyLimit"
+                    class="form-control"
+                    placeholder="Enter daily limit"
+                    min="1000"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-success">
+                  Create Account
+                </button>
+                <div class="error-message" id="createAccountError"></div>
+                <div class="success-message" id="createAccountSuccess"></div>
+              </form>
+            </div>
+
+            <div class="table-container">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-list"></i> All Accounts
+                </h3>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Account Number</th>
+                    <th>Type</th>
+                    <th>Balance</th>
+                    <th>Daily Limit</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allAccounts">
+                  <!-- All accounts will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Transactions Section -->
+          <div id="transactionsContent" class="content-section">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-filter"></i> Transaction Filters
+                </h3>
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                  gap: 1rem;
+                "
+              >
+                <div class="form-group">
+                  <label for="filterAccount">Account</label>
+                  <select id="filterAccount" class="form-control">
+                    <option value="">All Accounts</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="filterType">Transaction Type</label>
+                  <select id="filterType" class="form-control">
+                    <option value="">All Types</option>
+                    <option value="DEPOSIT">Deposit</option>
+                    <option value="WITHDRAWAL">Withdrawal</option>
+                    <option value="TRANSFER">Transfer</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="filterStatus">Status</label>
+                  <select id="filterStatus" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="FAILED">Failed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>&nbsp;</label>
+                  <button class="btn btn-primary" id="applyFilters">
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-list"></i> Transaction History
+                </h3>
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionHistory">
+                  <!-- Transaction history will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Transfer Section -->
+          <div id="transferContent" class="content-section">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+              "
+            >
+              <!-- Transfer Money -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-exchange-alt"></i> Transfer Money
+                  </h3>
+                </div>
+                <form id="transferForm">
+                  <div class="form-group">
+                    <label for="fromAccount">From Account</label>
+                    <select id="fromAccount" class="form-control" required>
+                      <option value="">Select Account</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="toAccountNumber">To Account Number</label>
+                    <input
+                      type="text"
+                      id="toAccountNumber"
+                      class="form-control"
+                      placeholder="Enter recipient account number"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="transferAmount">Amount</label>
+                    <input
+                      type="number"
+                      id="transferAmount"
+                      class="form-control"
+                      placeholder="Enter amount"
+                      step="0.01"
+                      min="0.01"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="transferDescription">Description</label>
+                    <input
+                      type="text"
+                      id="transferDescription"
+                      class="form-control"
+                      placeholder="Enter description (optional)"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    Transfer Money
+                  </button>
+                  <div class="error-message" id="transferError"></div>
+                  <div class="success-message" id="transferSuccess"></div>
+                </form>
+              </div>
+
+              <!-- Deposit Money -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-plus-circle"></i> Deposit Money
+                  </h3>
+                </div>
+                <form id="depositForm">
+                  <div class="form-group">
+                    <label for="depositAccount">Account</label>
+                    <select id="depositAccount" class="form-control" required>
+                      <option value="">Select Account</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="depositAmount">Amount</label>
+                    <input
+                      type="number"
+                      id="depositAmount"
+                      class="form-control"
+                      placeholder="Enter amount"
+                      step="0.01"
+                      min="0.01"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="depositDescription">Description</label>
+                    <input
+                      type="text"
+                      id="depositDescription"
+                      class="form-control"
+                      placeholder="Enter description (optional)"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-success">Deposit</button>
+                  <div class="error-message" id="depositError"></div>
+                  <div class="success-message" id="depositSuccess"></div>
+                </form>
+              </div>
+
+              <!-- Withdraw Money -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-minus-circle"></i> Withdraw Money
+                  </h3>
+                </div>
+                <form id="withdrawForm">
+                  <div class="form-group">
+                    <label for="withdrawAccount">Account</label>
+                    <select id="withdrawAccount" class="form-control" required>
+                      <option value="">Select Account</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="withdrawAmount">Amount</label>
+                    <input
+                      type="number"
+                      id="withdrawAmount"
+                      class="form-control"
+                      placeholder="Enter amount"
+                      step="0.01"
+                      min="0.01"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="withdrawDescription">Description</label>
+                    <input
+                      type="text"
+                      id="withdrawDescription"
+                      class="form-control"
+                      placeholder="Enter description (optional)"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-danger">Withdraw</button>
+                  <div class="error-message" id="withdrawError"></div>
+                  <div class="success-message" id="withdrawSuccess"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Application State
+      let currentUser = null;
+      let userAccounts = [];
+      let userTransactions = [];
+      let authToken = null;
+
+      // API Base URL - Update this to match your backend
+      const API_BASE_URL = "http://localhost:8080/api";
+
+      // Utility Functions
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(amount);
+      }
+
+      function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function showError(elementId, message) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = message;
+          element.style.display = "block";
+        }
+      }
+
+      function hideError(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.display = "none";
+        }
+      }
+
+      function showSuccess(elementId, message) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.textContent = message;
+          element.style.display = "block";
+        }
+      }
+
+      function hideSuccess(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.display = "none";
+        }
+      }
+
+      // API Service
+      class ApiService {
+        static async request(endpoint, options = {}) {
+          const url = `${API_BASE_URL}${endpoint}`;
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+              ...options.headers,
+            },
+            ...options,
+          };
+
+          if (authToken) {
+            config.headers["Authorization"] = `Bearer ${authToken}`;
+          }
+
+          try {
+            const response = await fetch(url, config);
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Request failed");
+            }
+
+            return data;
+          } catch (error) {
+            console.error("API Error:", error);
+            throw error;
+          }
+        }
+
+        static async login(credentials) {
+          return this.request("/auth/login", {
+            method: "POST",
+            body: JSON.stringify(credentials),
+          });
+        }
+
+        static async register(userData) {
+          return this.request("/auth/register", {
+            method: "POST",
+            body: JSON.stringify(userData),
+          });
+        }
+
+        static async getUserAccounts(userId) {
+          return this.request(`/accounts/user/${userId}`);
+        }
+
+        static async createAccount(accountData) {
+          return this.request("/accounts", {
+            method: "POST",
+            body: JSON.stringify(accountData),
+          });
+        }
+
+        static async getTransactions(accountId, filters = {}) {
+          const params = new URLSearchParams(filters);
+          return this.request(`/transactions/account/${accountId}?${params}`);
+        }
+
+        static async transfer(transferData) {
+          return this.request("/transactions/transfer", {
+            method: "POST",
+            body: JSON.stringify(transferData),
+          });
+        }
+
+        static async deposit(depositData) {
+          return this.request("/transactions/deposit", {
+            method: "POST",
+            body: JSON.stringify(depositData),
+          });
+        }
+
+        static async withdraw(withdrawData) {
+          return this.request("/transactions/withdraw", {
+            method: "POST",
+            body: JSON.stringify(withdrawData),
+          });
+        }
+      }
+
+      // Authentication Functions
+      function showSection(sectionId) {
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.remove("active");
+        });
+        document.getElementById(sectionId).classList.add("active");
+      }
+
+      function showContent(contentId) {
+        document.querySelectorAll(".content-section").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(contentId).classList.add("active");
+
+        // Update navigation
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("active");
+        });
+        document
+          .querySelector(`[data-section="${contentId.replace("Content", "")}"]`)
+          .classList.add("active");
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+
+        const loginSpinner = document.getElementById("loginSpinner");
+        const loginText = document.getElementById("loginText");
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+
+        // Show loading
+        loginSpinner.style.display = "inline-block";
+        loginText.textContent = "Signing In...";
+        submitBtn.disabled = true;
+
+        // Clear previous errors
+        hideError("loginError");
+        hideError("usernameError");
+        hideError("passwordError");
+
+        const credentials = {
+          username: document.getElementById("username").value,
+          password: document.getElementById("password").value,
+        };
+
+        try {
+          const response = await ApiService.login(credentials);
+
+          if (response.success) {
+            authToken = response.data.token;
+            currentUser = response.data;
+
+            // Update UI
+            document.getElementById(
+              "userWelcome"
+            ).textContent = `Welcome, ${currentUser.username}`;
+            showSuccess("loginSuccess", "Login successful!");
+
+            // Load user data
+            await loadUserData();
+
+            // Switch to main section
+            setTimeout(() => {
+              showSection("mainSection");
+              showContent("dashboardContent");
+            }, 1000);
+          } else {
+            showError("loginError", response.message || "Login failed");
+          }
+        } catch (error) {
+          showError(
+            "loginError",
+            error.message || "Login failed. Please try again."
+          );
+        } finally {
+          // Hide loading
+          loginSpinner.style.display = "none";
+          loginText.textContent = "Sign In";
+          submitBtn.disabled = false;
+        }
+      }
+
+      async function handleRegister(event) {
+        event.preventDefault();
+
+        const registerSpinner = document.getElementById("registerSpinner");
+        const registerText = document.getElementById("registerText");
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+
+        // Show loading
+        registerSpinner.style.display = "inline-block";
+        registerText.textContent = "Creating Account...";
+        submitBtn.disabled = true;
+
+        // Clear previous errors
+        hideError("registerError");
+
+        const userData = {
+          username: document.getElementById("regUsername").value,
+          email: document.getElementById("regEmail").value,
+          password: document.getElementById("regPassword").value,
+          firstName: document.getElementById("regFirstName").value,
+          lastName: document.getElementById("regLastName").value,
+          phoneNumber: document.getElementById("regPhone").value,
+        };
+
+        try {
+          const response = await ApiService.register(userData);
+
+          if (response.success) {
+            showSuccess(
+              "registerSuccess",
+              "Account created successfully! Please sign in."
+            );
+            setTimeout(() => {
+              showSection("loginSection");
+            }, 2000);
+          } else {
+            showError(
+              "registerError",
+              response.message || "Registration failed"
+            );
+          }
+        } catch (error) {
+          showError(
+            "registerError",
+            error.message || "Registration failed. Please try again."
+          );
+        } finally {
+          // Hide loading
+          registerSpinner.style.display = "none";
+          registerText.textContent = "Create Account";
+          submitBtn.disabled = false;
+        }
+      }
+
+      function handleLogout() {
+        authToken = null;
+        currentUser = null;
+        userAccounts = [];
+        userTransactions = [];
+
+        // Clear forms
+        document.querySelectorAll("form").forEach((form) => form.reset());
+
+        // Clear error messages
+        document
+          .querySelectorAll(".error-message, .success-message")
+          .forEach((el) => {
+            el.style.display = "none";
+          });
+
+        showSection("loginSection");
+      }
+
+      // Data Loading Functions
+      async function loadUserData() {
+        try {
+          // Load user accounts
+          const accountsResponse = await ApiService.getUserAccounts(
+            currentUser.userId
+          );
+          if (accountsResponse.success) {
+            userAccounts = accountsResponse.data;
+            renderDashboard();
+            renderAccountsSection();
+            populateAccountDropdowns();
+          }
+
+          // Load recent transactions
+          if (userAccounts.length > 0) {
+            await loadTransactions();
+          }
+        } catch (error) {
+          console.error("Failed to load user data:", error);
+        }
+      }
+
+      async function loadTransactions() {
+        try {
+          userTransactions = [];
+          for (const account of userAccounts) {
+            const transactionsResponse = await ApiService.getTransactions(
+              account.id
+            );
+            if (transactionsResponse.success) {
+              userTransactions.push(...transactionsResponse.data);
+            }
+          }
+
+          // Sort by date (newest first)
+          userTransactions.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
+          renderRecentTransactions();
+          renderTransactionHistory();
+        } catch (error) {
+          console.error("Failed to load transactions:", error);
+        }
+      }
+
+      // Rendering Functions
+      function renderDashboard() {
+        const accountsGrid = document.getElementById("accountsGrid");
+        accountsGrid.innerHTML = "";
+
+        userAccounts.forEach((account) => {
+          const accountCard = document.createElement("div");
+          accountCard.className = "card";
+          accountCard.innerHTML = `
+                    <div class="card-header">
+                        <h3 class="card-title">${
+                          account.accountType
+                        } Account</h3>
+                        <i class="card-icon fas fa-${getAccountIcon(
+                          account.accountType
+                        )}"></i>
+                    </div>
+                    <div class="balance">${formatCurrency(
+                      account.balance
+                    )}</div>
+                    <div class="account-number">Account: ${
+                      account.accountNumber
+                    }</div>
+                    <div style="margin-top: 1rem; font-size: 0.9rem;">
+                        <div>Available: ${formatCurrency(
+                          account.availableBalance
+                        )}</div>
+                        <div>Daily Limit: ${formatCurrency(
+                          account.dailyLimit
+                        )}</div>
+                        <div>Status: <span class="status-badge ${
+                          account.isActive
+                            ? "status-completed"
+                            : "status-failed"
+                        }">
+                            ${account.isActive ? "Active" : "Inactive"}
+                        </span></div>
+                    </div>
+                `;
+          accountsGrid.appendChild(accountCard);
+        });
+      }
+
+      function renderRecentTransactions() {
+        const tbody = document.getElementById("recentTransactions");
+        tbody.innerHTML = "";
+
+        const recentTransactions = userTransactions.slice(0, 10);
+
+        recentTransactions.forEach((transaction) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${formatDate(transaction.createdAt)}</td>
+                    <td>${transaction.transactionType}</td>
+                    <td>${transaction.description || "-"}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                    <td><span class="status-badge status-${transaction.status.toLowerCase()}">${
+            transaction.status
+          }</span></td>
+                `;
+          tbody.appendChild(row);
+        });
+
+        if (recentTransactions.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" style="text-align: center;">No transactions found</td></tr>';
+        }
+      }
+
+      function renderAccountsSection() {
+        const tbody = document.getElementById("allAccounts");
+        tbody.innerHTML = "";
+
+        userAccounts.forEach((account) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${account.accountNumber}</td>
+                    <td>${account.accountType}</td>
+                    <td>${formatCurrency(account.balance)}</td>
+                    <td>${formatCurrency(account.dailyLimit)}</td>
+                    <td><span class="status-badge ${
+                      account.isActive ? "status-completed" : "status-failed"
+                    }">
+                        ${account.isActive ? "Active" : "Inactive"}
+                    </span></td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewAccountDetails(${
+                          account.id
+                        })">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                `;
+          tbody.appendChild(row);
+        });
+      }
+
+      function renderTransactionHistory() {
+        const tbody = document.getElementById("transactionHistory");
+        tbody.innerHTML = "";
+
+        userTransactions.forEach((transaction) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${formatDate(transaction.createdAt)}</td>
+                    <td>${transaction.transactionReference}</td>
+                    <td>${transaction.transactionType}</td>
+                    <td>${transaction.fromAccountNumber || "-"}</td>
+                    <td>${transaction.toAccountNumber || "-"}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                    <td><span class="status-badge status-${transaction.status.toLowerCase()}">${
+            transaction.status
+          }</span></td>
+                    <td>${transaction.description || "-"}</td>
+                `;
+          tbody.appendChild(row);
+        });
+
+        if (userTransactions.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="8" style="text-align: center;">No transactions found</td></tr>';
+        }
+      }
+
+      function populateAccountDropdowns() {
+        const dropdowns = [
+          "fromAccount",
+          "depositAccount",
+          "withdrawAccount",
+          "filterAccount",
+        ];
+
+        dropdowns.forEach((dropdownId) => {
+          const dropdown = document.getElementById(dropdownId);
+          if (dropdown) {
+            // Clear existing options except the first one
+            while (dropdown.children.length > 1) {
+              dropdown.removeChild(dropdown.lastChild);
+            }
+
+            userAccounts.forEach((account) => {
+              const option = document.createElement("option");
+              option.value =
+                dropdownId === "fromAccount"
+                  ? account.accountNumber
+                  : account.id;
+              option.textContent = `${account.accountType} - ${
+                account.accountNumber
+              } (${formatCurrency(account.balance)})`;
+              dropdown.appendChild(option);
+            });
+          }
+        });
+      }
+
+      function getAccountIcon(accountType) {
+        const icons = {
+          SAVINGS: "piggy-bank",
+          CHECKING: "credit-card",
+          BUSINESS: "briefcase",
+          FIXED_DEPOSIT: "lock",
+        };
+        return icons[accountType] || "wallet";
+      }
+
+      // Transaction Functions
+      async function handleTransfer(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+
+        hideError("transferError");
+        hideSuccess("transferSuccess");
+
+        const transferData = {
+          fromAccountNumber: document.getElementById("fromAccount").value,
+          toAccountNumber: document.getElementById("toAccountNumber").value,
+          amount: parseFloat(document.getElementById("transferAmount").value),
+          description: document.getElementById("transferDescription").value,
+        };
+
+        try {
+          const response = await ApiService.transfer(transferData);
+
+          if (response.success) {
+            showSuccess("transferSuccess", "Transfer completed successfully!");
+            event.target.reset();
+            await loadUserData(); // Refresh data
+          } else {
+            showError("transferError", response.message || "Transfer failed");
+          }
+        } catch (error) {
+          showError(
+            "transferError",
+            error.message || "Transfer failed. Please try again."
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Transfer Money";
+        }
+      }
+
+      async function handleDeposit(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+
+        hideError("depositError");
+        hideSuccess("depositSuccess");
+
+        const depositData = {
+          accountId: parseInt(document.getElementById("depositAccount").value),
+          amount: parseFloat(document.getElementById("depositAmount").value),
+          description: document.getElementById("depositDescription").value,
+        };
+
+        try {
+          const response = await ApiService.deposit(depositData);
+
+          if (response.success) {
+            showSuccess("depositSuccess", "Deposit completed successfully!");
+            event.target.reset();
+            await loadUserData(); // Refresh data
+          } else {
+            showError("depositError", response.message || "Deposit failed");
+          }
+        } catch (error) {
+          showError(
+            "depositError",
+            error.message || "Deposit failed. Please try again."
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Deposit";
+        }
+      }
+
+      async function handleWithdraw(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+
+        hideError("withdrawError");
+        hideSuccess("withdrawSuccess");
+
+        const withdrawData = {
+          accountId: parseInt(document.getElementById("withdrawAccount").value),
+          amount: parseFloat(document.getElementById("withdrawAmount").value),
+          description: document.getElementById("withdrawDescription").value,
+        };
+
+        try {
+          const response = await ApiService.withdraw(withdrawData);
+
+          if (response.success) {
+            showSuccess(
+              "withdrawSuccess",
+              "Withdrawal completed successfully!"
+            );
+            event.target.reset();
+            await loadUserData(); // Refresh data
+          } else {
+            showError("withdrawError", response.message || "Withdrawal failed");
+          }
+        } catch (error) {
+          showError(
+            "withdrawError",
+            error.message || "Withdrawal failed. Please try again."
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Withdraw";
+        }
+      }
+
+      async function handleCreateAccount(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Creating...';
+
+        hideError("createAccountError");
+        hideSuccess("createAccountSuccess");
+
+        const accountData = {
+          userId: currentUser.userId,
+          accountType: document.getElementById("accountType").value,
+          dailyLimit: parseFloat(document.getElementById("dailyLimit").value),
+        };
+
+        try {
+          const response = await ApiService.createAccount(accountData);
+
+          if (response.success) {
+            showSuccess(
+              "createAccountSuccess",
+              "Account created successfully!"
+            );
+            event.target.reset();
+            await loadUserData(); // Refresh data
+          } else {
+            showError(
+              "createAccountError",
+              response.message || "Account creation failed"
+            );
+          }
+        } catch (error) {
+          showError(
+            "createAccountError",
+            error.message || "Account creation failed. Please try again."
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Create Account";
+        }
+      }
+
+      function viewAccountDetails(accountId) {
+        // This could open a modal or navigate to account details
+        console.log("View account details for account ID:", accountId);
+      }
+
+      // Event Listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        // Navigation
+        document
+          .getElementById("showRegister")
+          .addEventListener("click", (e) => {
+            e.preventDefault();
+            showSection("registerSection");
+          });
+
+        document.getElementById("showLogin").addEventListener("click", (e) => {
+          e.preventDefault();
+          showSection("loginSection");
+        });
+
+        document
+          .getElementById("logoutBtn")
+          .addEventListener("click", handleLogout);
+
+        // Forms
+        document
+          .getElementById("loginForm")
+          .addEventListener("submit", handleLogin);
+        document
+          .getElementById("registerForm")
+          .addEventListener("submit", handleRegister);
+        document
+          .getElementById("createAccountForm")
+          .addEventListener("submit", handleCreateAccount);
+        document
+          .getElementById("transferForm")
+          .addEventListener("submit", handleTransfer);
+        document
+          .getElementById("depositForm")
+          .addEventListener("submit", handleDeposit);
+        document
+          .getElementById("withdrawForm")
+          .addEventListener("submit", handleWithdraw);
+
+        // Navigation menu
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const section = e.target.closest("a").dataset.section;
+            showContent(section + "Content");
+          });
+        });
+
+        // Filter functionality
+        document
+          .getElementById("applyFilters")
+          .addEventListener("click", async () => {
+            // Implement filter logic here
+            await loadTransactions();
+          });
+
+        // Initialize app
+        const savedToken = localStorage.getItem("authToken");
+        if (savedToken) {
+          authToken = savedToken;
+          // Try to load user data if token exists
+          // You might want to validate the token first
+        }
+      });
+
+      // Save token to localStorage on successful login
+      function saveAuthToken(token) {
+        localStorage.setItem("authToken", token);
+      }
+
+      // Remove token from localStorage on logout
+      function removeAuthToken() {
+        localStorage.removeItem("authToken");
+      }
+    </script>
+  </body>
+</html>

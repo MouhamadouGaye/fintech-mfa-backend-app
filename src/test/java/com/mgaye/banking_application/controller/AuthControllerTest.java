@@ -55,7 +55,7 @@ class AuthControllerTest {
     @BeforeEach
     void setUp() {
         loginDto = new LoginDto();
-        loginDto.setUsername("testuser");
+        loginDto.setEmail("testuser");
         loginDto.setPassword("password");
 
         registrationDto = new UserRegistrationDto();

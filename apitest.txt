@@ -1,0 +1,38 @@
+curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "admin@bank.com",
+    "password": "Admin@123"
+  }'
+
+
+
+curl -X POST http://localhost:8080/banking-api/api/auth/register \
+  -H "Content-Type: application/json" \
+  -H "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1NDI0ODYyMywiZXhwIjoxNzU0MjY2NjIzfQ.CaRNtiziJ7ljXeGirtDBjqCCrCoQ2JiwMUmm5l5JJm_43uBa2MtYB7xW5hHtzIL1IPdItQXUnIvKWL1PMYCgwA" \
+  -d '{
+    "username": "Hawa",
+    "email": "hawa@example.com",
+    "firstName": "Hawa",
+    "lastName": "GAYE",
+    "password": "Hawa@123",
+    "phoneNumber": "1234577770",
+    "address": "123 Main St",
+    "dateOfBirth": "2000-01-01",
+    "role": "CUSTOMER"
+  }'
+
+
+curl -X POST http://localhost:8080/banking-api/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "Hawa",
+    "email": "hawa@example.com",
+    "firstName": "Hawa",
+    "lastName": "GAYE",
+    "password": "Hawa@123",
+    "phoneNumber": "1234577770",
+    "address": "123 Main St",
+    "dateOfBirth": "2000-01-01",
+    "role": "CUSTOMER"
+  }'

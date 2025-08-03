@@ -9,15 +9,15 @@ spring:
     name: banking-backend
   
   datasource:
-    url: jdbc:h2:mem:bankingdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
+    url: jdbc:postgresql://localhost:5433/bankingsys
+    driver-class-name: org.postgresql.Driver
+    username: gaye
+    password: Postgres.2424
     
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  # h2:
+  #   console:
+  #     enabled: true
+  #     path: /h2-console
       
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -52,7 +52,7 @@ logging:
 
 # JWT Configuration
 jwt:
-  secret: mySecretKey
+  secret: itrZjz8EfvXL+w+dxxhKygic2jH8sZ6fdUAJrj/GJNmdl8XfRXY0ZWGPAj6Sg1MGDcGJMKsYw1Dabaw7hv5GHA==
   expiration: 18000 # 5 hours in seconds
 
 # Banking specific configurations

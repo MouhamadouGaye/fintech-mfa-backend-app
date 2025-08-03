@@ -95,8 +95,8 @@ public class UserService {
         auditService.logAction("USER_UNLOCKED", "User", userId, "User unlocked");
     }
 
-    public void incrementFailedLoginAttempts(String username) {
-        User user = userRepository.findByUsername(username)
+    public void incrementFailedLoginAttempts(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
@@ -110,8 +110,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void resetFailedLoginAttempts(String username) {
-        User user = userRepository.findByUsername(username)
+    public void resetFailedLoginAttempts(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setFailedLoginAttempts(0);

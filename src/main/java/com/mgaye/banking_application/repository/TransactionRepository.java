@@ -36,9 +36,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
 
-        @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.fromAccount.id = :accountId " +
-                        "AND t.transactionType = 'WITHDRAWAL' AND t.status = 'COMPLETED' " +
-                        "AND DATE(t.createdAt) = CURRENT_DATE")
+        // @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.fromAccount.id =
+        // :accountId " +
+        // "AND t.transactionType = 'WITHDRAWAL' AND t.status = 'COMPLETED' " +
+        // "AND DATE(t.createdAt) = CURRENT_DATE")
+        // BigDecimal getDailyWithdrawalAmount(@Param("accountId") Long accountId);
+
+        @Query(value = "SELECT COALESCE(SUM(amount), 0) FROM transaction " +
+                        "WHERE from_account_id = :accountId " +
+                        "AND transaction_type = 'WITHDRAWAL' " +
+                        "AND status = 'COMPLETED' " +
+                        "AND DATE(created_at) = CURRENT_DATE", nativeQuery = true)
         BigDecimal getDailyWithdrawalAmount(@Param("accountId") Long accountId);
 
         @Query("SELECT COUNT(t) FROM Transaction t WHERE t.status = 'PENDING' AND t.createdAt < :cutoffTime")
