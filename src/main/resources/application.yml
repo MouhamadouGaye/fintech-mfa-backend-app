@@ -1,0 +1,68 @@
+# application.yml
+server:
+  port: 8080
+  servlet:
+    context-path: /banking-api
+
+spring:
+  application:
+    name: banking-backend
+  
+  datasource:
+    url: jdbc:h2:mem:bankingdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  security:
+    user:
+      name: admin
+      password: admin123
+
+logging:
+  level:
+    com.bank.application: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/banking-app.log
+
+# JWT Configuration
+jwt:
+  secret: mySecretKey
+  expiration: 18000 # 5 hours in seconds
+
+# Banking specific configurations
+banking:
+  account:
+    default-daily-limit: 5000.00
+    max-daily-limit: 50000.00
+  transaction:
+    max-amount: 1000000.00
+    daily-transaction-limit: 100
+  security:
+    max-failed-attempts: 5
+    account-lock-duration: 24 # hours

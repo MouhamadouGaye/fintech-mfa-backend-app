@@ -1,0 +1,17 @@
+# application-dev.yml
+spring:
+  config:
+    activate:
+      on-profile: dev
+      
+  datasource:
+    url: jdbc:h2:file:./data/bankingdb
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    
+logging:
+  level:
+    com.bank.application: DEBUG

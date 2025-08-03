@@ -1,0 +1,7 @@
+package com.mgaye.banking_application.exception;
+
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+}

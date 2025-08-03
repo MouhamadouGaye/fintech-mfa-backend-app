@@ -1,0 +1,22 @@
+# application-prod.yml
+spring:
+  config:
+    activate:
+      on-profile: prod
+      
+  datasource:
+    url: jdbc:postgresql://localhost:5432/banking_db
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:banking_user}
+    password: ${DB_PASSWORD:banking_pass}
+    
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    
+logging:
+  level:
+    com.bank.application: INFO
+    root: WARN
