@@ -2,7 +2,6 @@ package com.mgaye.banking_application.Controller;
 
 import java.util.List;
 
-import org.springdoc.core.service.SecurityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -23,6 +22,7 @@ import com.mgaye.banking_application.dto.UserSessionDto;
 import com.mgaye.banking_application.dto.request.UpdateProfileRequest;
 import com.mgaye.banking_application.dto.response.MessageResponse;
 import com.mgaye.banking_application.entity.User;
+import com.mgaye.banking_application.service.SecurityService;
 import com.mgaye.banking_application.service.UserService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;

@@ -21,6 +21,12 @@ public class Location {
     private String isp;
     private String organization;
 
+    public Location(String city, Double latitude, Double longitude) {
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     @Override
     public String toString() {
         return String.format("%s, %s, %s",

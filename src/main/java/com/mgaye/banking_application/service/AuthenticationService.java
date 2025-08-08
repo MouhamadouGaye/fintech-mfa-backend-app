@@ -31,6 +31,7 @@ import com.mgaye.banking_application.exception.TooManyAttemptsException;
 import com.mgaye.banking_application.exception.UserAlreadyExistsException;
 import com.mgaye.banking_application.repository.UserRepository;
 import com.mgaye.banking_application.security.JwtTokenProvider;
+import com.mgaye.banking_application.utility.ClientIpAddress;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -45,6 +46,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordService passwordService;
     private final JwtTokenProvider jwtTokenProvider;
+
     private final EmailService emailService;
     private final SmsService smsService;
     private final SecurityService securityService;
@@ -54,13 +56,14 @@ public class AuthenticationService {
     private final MfaService mfaService;
     private final TokenService tokenService;
     private final LoginAttemptService loginAttemptService;
+    private final ClientIpAddress clientIpAddress;
 
     public AuthenticationService(UserRepository userRepository,
             PasswordEncoder passwordEncoder, PasswordService passwordService,
             JwtTokenProvider jwtTokenProvider, EmailService emailService, SmsService smsService,
             SecurityService securityService, AuditService auditService, RateLimitService rateLimitService,
             DeviceService deviceService, MfaService mfaService, TokenService tokenService,
-            LoginAttemptService loginAttenptService) {
+            LoginAttemptService loginAttenptService, ClientIpAddress clientIpAddress) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.passwordService = passwordService;
@@ -74,12 +77,13 @@ public class AuthenticationService {
         this.mfaService = mfaService;
         this.tokenService = tokenService;
         this.loginAttemptService = loginAttemptService;
+        this.clientIpAddress = clientIpAddress;
     }
 
     // ✅ Email-based Authentication
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletRequest httpRequest) {
         String email = request.getEmail().toLowerCase().trim();
-        String ipAddress = getClientIpAddress(httpRequest);
+        String ipAddress = clientIpAddress.getClientIpAddress(httpRequest);
         String userAgent = httpRequest.getHeader("User-Agent");
 
         // Rate limiting
@@ -246,7 +250,7 @@ public class AuthenticationService {
     // ✅ Registration with Email Verification
     public RegistrationResponse register(RegistrationRequest request, HttpServletRequest httpRequest) {
         String email = request.getEmail().toLowerCase().trim();
-        String ipAddress = getClientIpAddress(httpRequest);
+        String ipAddress = clientIpAddress.getClientIpAddress(httpRequest);
 
         // Check if user already exists
         if (userRepository.existsByEmailIgnoreCase(email)) {
@@ -288,7 +292,7 @@ public class AuthenticationService {
         return RegistrationResponse.builder()
                 .message("Registration successful. Please check your email for verification.")
                 .email(email)
-                .verificationRequired(true)
+                .requiresEmailVerification(true)
                 .build();
     }
 

@@ -3,11 +3,13 @@ package com.mgaye.banking_application.dto.request;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class UpdateProfileRequest {
     @Pattern(regexp = "^[a-zA-Z\\s'-]{1,100}$", message = "Invalid first name format")
     private String firstName;

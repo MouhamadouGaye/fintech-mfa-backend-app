@@ -26,13 +26,10 @@ import com.mgaye.banking_application.exception.EmailServiceException;
 @RequiredArgsConstructor
 public class EmailService {
 
-    // Add these methods to your existing EmailService class
-
     private final RedisTemplate<String, String> redisTemplate; // Add this field
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    // Add this to your constructor or use @Autowired
     public EmailService(JavaMailSender mailSender,
             TemplateEngine templateEngine,
             RedisTemplate<String, String> redisTemplate) {
