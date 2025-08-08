@@ -1,0 +1,13 @@
+package com.mgaye.banking_application.entity;
+
+public enum SecurityAlertType {
+    SUSPICIOUS_LOGIN,
+    MULTIPLE_FAILED_ATTEMPTS,
+    NEW_DEVICE_LOGIN,
+    UNUSUAL_LOCATION,
+    ACCOUNT_LOCKED,
+    PASSWORD_CHANGED,
+    MFA_DISABLED,
+    HIGH_VALUE_TRANSACTION,
+    ACCOUNT_COMPROMISED
+}

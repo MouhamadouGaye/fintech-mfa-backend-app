@@ -1,6 +1,8 @@
 package com.mgaye.banking_application.repository;
 
 import com.mgaye.banking_application.entity.AuditLog;
+import com.mgaye.banking_application.entity.User;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +36,9 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
         @Query("SELECT COUNT(a) FROM AuditLog a WHERE a.action LIKE %:actionPattern% " +
                         "AND a.createdAt >= :since")
         Long countActionsSince(@Param("actionPattern") String actionPattern, @Param("since") LocalDateTime since);
+
+        List<AuditLog> findByUserOrderByTimestampDesc(User user, Pageable pageable);
+
+        @Query("SELECT a FROM AuditLog a WHERE a.action = :action AND a.timestamp > :since")
+        List<AuditLog> findByActionSince(@Param("action") String action, @Param("since") LocalDateTime since);
 }

@@ -9,7 +9,7 @@ curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
 
 curl -X POST http://localhost:8080/banking-api/api/auth/register \
   -H "Content-Type: application/json" \
-  -H "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1NDI0ODYyMywiZXhwIjoxNzU0MjY2NjIzfQ.CaRNtiziJ7ljXeGirtDBjqCCrCoQ2JiwMUmm5l5JJm_43uBa2MtYB7xW5hHtzIL1IPdItQXUnIvKWL1PMYCgwA" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1NDI0ODYyMywiZXhwIjoxNzU0MjY2NjIzfQ.CaRNtiziJ7ljXeGirtDBjqCCrCoQ2JiwMUmm5l5JJm_43uBa2MtYB7xW5hHtzIL1IPdItQXUnIvKWL1PMYCgwA" \
   -d '{
     "username": "Hawa",
     "email": "hawa@example.com",
@@ -36,3 +36,8 @@ curl -X POST http://localhost:8080/banking-api/api/auth/register \
     "dateOfBirth": "2000-01-01",
     "role": "CUSTOMER"
   }'
+
+
+curl -X POST http://localhost:8080/banking-api/api/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDMxNDE5OSwiZXhwIjoxNzU0MzMyMTk5fQ.X37iW0MLMez2T20fOobjK5_lhSnbZ2e2LZyydiWsuK4dbrVrfB_Kj0XDnQt8UNACp8pDzptZmPjgDiUbQwqkxw" \
+  -H "Content-Type: application/json"

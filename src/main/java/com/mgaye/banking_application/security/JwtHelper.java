@@ -113,8 +113,14 @@ public class JwtHelper {
         return expiration.before(new Date());
     }
 
+    // public String generateToken(UserDetails userDetails) {
+    // Map<String, Object> claims = new HashMap<>();
+    // return doGenerateToken(claims, userDetails.getUsername());
+
+    // }
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -132,4 +138,5 @@ public class JwtHelper {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }

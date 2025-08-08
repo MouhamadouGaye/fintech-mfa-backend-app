@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Your MFA Code</title>
+  </head>
+  <body>
+    <h2>Your MFA Code</h2>
+    <p>Your Multi-Factor Authentication code is:</p>
+    <h1 style="color: #007bff; font-family: monospace" th:text="${mfaCode}">
+      123456
+    </h1>
+    <p>
+      This code will expire in
+      <span th:text="${expirationMinutes}">5</span> minutes.
+    </p>
+    <p>If you didn't request this code, please contact support immediately.</p>
+  </body>
+</html>

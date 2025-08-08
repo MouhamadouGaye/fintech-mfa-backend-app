@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verify Your Email</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background: #007bff;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+        background: #f9f9f9;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .footer {
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Welcome to Banking System</h1>
+      </div>
+      <div class="content">
+        <h2>Hi <span th:text="${user.firstName}">User</span>,</h2>
+        <p>
+          Thank you for registering with our banking system. To complete your
+          registration, please verify your email address by clicking the button
+          below:
+        </p>
+        <p style="text-align: center">
+          <a th:href="${verificationUrl}" class="button">Verify Email</a>
+        </p>
+        <p>
+          If the button doesn't work, copy and paste this link into your
+          browser:
+        </p>
+        <p>
+          <a th:href="${verificationUrl}" th:text="${verificationUrl}"
+            >Verification URL</a
+          >
+        </p>
+        <p>This link will expire in 24 hours for security reasons.</p>
+        <p>
+          If you didn't create an account with us, please ignore this email.
+        </p>
+      </div>
+      <div class="footer">
+        <p>&copy; 2025 Banking System. All rights reserved.</p>
+        <p>This is an automated message, please do not reply.</p>
+      </div>
+    </div>
+  </body>
+</html>

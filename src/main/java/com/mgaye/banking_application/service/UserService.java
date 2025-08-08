@@ -4,18 +4,27 @@ import com.mgaye.banking_application.dto.UserRegistrationDto;
 import com.mgaye.banking_application.dto.UserResponseDto;
 import com.mgaye.banking_application.entity.User;
 import com.mgaye.banking_application.entity.Role;
+import com.mgaye.banking_application.exception.AccountAlreadyVerifiedException;
+import com.mgaye.banking_application.exception.InvalidTokenException;
+import com.mgaye.banking_application.exception.PasswordReusedException;
+import com.mgaye.banking_application.exception.TokenExpiredException;
 import com.mgaye.banking_application.exception.UserAlreadyExistsException;
 import com.mgaye.banking_application.exception.UserNotFoundException;
 import com.mgaye.banking_application.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,28 +33,52 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
+    private final TokenService tokenService;
+    private final TotpManager totpManager;
+    private final TotpService totpService;
+    private final NotificationService notificationService;
+    private final PasswordService passwordService;
 
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
-        if (userRepository.existsByUsername(registrationDto.getUsername())) {
-            throw new UserAlreadyExistsException("Username already exists");
-        }
 
-        if (userRepository.existsByEmail(registrationDto.getEmail())) {
+        String normalizedEmail = registrationDto.getEmail().trim().toLowerCase();
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new UserAlreadyExistsException("Email already exists");
         }
-
+        // Create a new user entity
         User user = new User();
-        user.setUsername(registrationDto.getUsername());
-        user.setEmail(registrationDto.getEmail());
+        user.setUsername(registrationDto.getUsername().trim());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        user.setFirstName(registrationDto.getFirstName());
-        user.setLastName(registrationDto.getLastName());
-        user.setPhoneNumber(registrationDto.getPhoneNumber());
-        user.setAddress(registrationDto.getAddress());
-        user.setDateOfBirth(registrationDto.getDateOfBirth());
+        user.setFirstName(registrationDto.getFirstName().trim());
+        user.setLastName(registrationDto.getLastName().trim());
+        user.setPhoneNumber(registrationDto.getPhoneNumber().trim());
+        user.setAddress(registrationDto.getAddress().trim());
+        user.setDateOfBirth(java.time.LocalDate.parse(registrationDto.getDateOfBirth()));
         user.setRole(Role.CUSTOMER);
 
+        // Account should be inactive and unverified at registration
+        user.setIsActive(false);
+        user.setIsVerified(false);
+        user.setAccountLockedUntil(null);
+
+        // Generate 2FA secret key (if you plan to support TOTP)
+        String mfaSecret = totpService.generateSecret();
+        user.setMfaSecret(mfaSecret);
+
+        // Optionally: generate email verification token or OTP
+        String verificationToken = tokenService.generateVerificationToken(user);
+        user.setVerificationToken(verificationToken);
+        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+
+        // Save user to DB
         User savedUser = userRepository.save(user);
+
+        // Send verification email or SMS here (async preferred)
+        notificationService.sendVerificationEmail(savedUser.getEmail(), verificationToken);
+
+        // Audit log
         auditService.logAction("USER_REGISTERED", "User", savedUser.getId(),
                 "New user registered: " + savedUser.getUsername());
 
@@ -63,6 +96,13 @@ public class UserService {
     public UserResponseDto getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        return convertToResponseDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + email));
         return convertToResponseDto(user);
     }
 
@@ -127,11 +167,211 @@ public class UserService {
         dto.setLastName(user.getLastName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setAddress(user.getAddress());
-        dto.setDateOfBirth(user.getDateOfBirth());
+        dto.setDateOfBirth(user.getDateOfBirth().toString());
         dto.setRole(user.getRole().toString());
         dto.setIsActive(user.getIsActive());
         dto.setIsVerified(user.getIsVerified());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
+    }
+
+    // Add these methods to your UserService class
+
+    /**
+     * Verifies email using verification token
+     */
+    public void verifyEmail(String token, String ipAddress) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new InvalidTokenException("Invalid verification token");
+        }
+
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid or expired verification token"));
+
+        // Check if token is expired
+        if (user.getVerificationTokenExpiry() != null &&
+                LocalDateTime.now().isAfter(user.getVerificationTokenExpiry())) {
+            throw new TokenExpiredException("Verification token has expired");
+        }
+
+        // Check if already verified
+        if (user.getIsVerified()) {
+            throw new AccountAlreadyVerifiedException("Email is already verified");
+        }
+
+        // Verify the user
+        user.setIsVerified(true);
+        user.setIsActive(true);
+        user.setVerificationToken(null);
+        user.setVerificationTokenExpiry(null);
+        user.setVerificationTokenExpiry(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        // Send welcome email
+        notificationService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
+
+        // Log the action
+        auditService.logAction("EMAIL_VERIFIED", "User", user.getId(),
+                "Email verified successfully from IP: " + ipAddress);
+
+        log.info("Email verified successfully for user: {}", user.getEmail());
+    }
+
+    /**
+     * Initiates password reset process
+     */
+    public void initiatePasswordReset(String email, String ipAddress) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        String normalizedEmail = email.trim().toLowerCase();
+
+        // Always return success to prevent email enumeration attacks
+        // But only send email if user exists
+        Optional<User> userOpt = userRepository.findByEmail(normalizedEmail);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // Check if account is active
+            if (!user.getIsActive()) {
+                log.warn("Password reset attempted for inactive account: {}", normalizedEmail);
+                return; // Don't reveal that account is inactive
+            }
+
+            // Generate reset token
+            String resetToken = tokenService.generatePasswordResetToken(user);
+            user.setPasswordResetToken(resetToken);
+            user.setPasswordResetTokenExpiry(LocalDateTime.now().plusHours(1));
+
+            userRepository.save(user);
+
+            // Send password reset email
+            notificationService.sendPasswordResetEmail(user.getEmail(), resetToken);
+
+            // Log the action
+            auditService.logAction("PASSWORD_RESET_REQUESTED", "User", user.getId(),
+                    "Password reset requested from IP: " + ipAddress);
+
+            log.info("Password reset initiated for user: {}", normalizedEmail);
+        } else {
+            log.warn("Password reset requested for non-existent email: {}", normalizedEmail);
+            // Still log for security monitoring
+            auditService.logAction("PASSWORD_RESET_INVALID_EMAIL", "System", null,
+                    "Password reset requested for non-existent email: " + normalizedEmail + " from IP: " + ipAddress);
+        }
+    }
+
+    /**
+     * Resets password using reset token
+     */
+    public void resetPassword(String token, String newPassword, String ipAddress) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new InvalidTokenException("Invalid reset token");
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("New password cannot be empty");
+        }
+
+        User user = userRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid or expired reset token"));
+
+        // Check if token is expired
+        if (user.getPasswordResetTokenExpiry() != null &&
+                LocalDateTime.now().isAfter(user.getPasswordResetTokenExpiry())) {
+            throw new TokenExpiredException("Reset token has expired");
+        }
+
+        // Validate new password strength
+        passwordService.validatePasswordStrength(newPassword);
+
+        // Check password history (optional - you might want to skip this for reset)
+        try {
+            passwordService.validatePasswordHistory(user, newPassword);
+        } catch (PasswordReusedException e) {
+            // For password reset, you might want to allow reuse or show a warning
+            log.warn("User attempting to reuse recent password during reset: {}", user.getEmail());
+        }
+
+        // Save current password to history before changing
+        if (user.getPassword() != null) {
+            passwordService.savePasswordHistory(user, user.getPassword(),
+                    "PASSWORD_RESET", ipAddress);
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+        user.setPasswordChangedAt(LocalDateTime.now());
+
+        // Reset failed login attempts
+        user.setFailedLoginAttempts(0);
+        user.setAccountLockedUntil(null);
+
+        userRepository.save(user);
+
+        // Send confirmation email
+        notificationService.sendPasswordResetConfirmationEmail(user.getEmail(), user.getFirstName());
+
+        // Log the action
+        auditService.logAction("PASSWORD_RESET_COMPLETED", "User", user.getId(),
+                "Password reset completed from IP: " + ipAddress);
+
+        log.info("Password reset completed for user: {}", user.getEmail());
+    }
+
+    /**
+     * Changes password for authenticated user
+     */
+    public void changePassword(User user, String currentPassword, String newPassword, String ipAddress) {
+        if (currentPassword == null || currentPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("Current password cannot be empty");
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("New password cannot be empty");
+        }
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            // Log failed attempt
+            auditService.logAction("PASSWORD_CHANGE_FAILED", "User", user.getId(),
+                    "Invalid current password provided from IP: " + ipAddress);
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // Validate new password strength
+        passwordService.validatePasswordStrength(newPassword);
+
+        // Check password history
+        passwordService.validatePasswordHistory(user, newPassword);
+
+        // Check if new password is same as current
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        // Save current password to history
+        passwordService.savePasswordHistory(user, user.getPassword(),
+                "PASSWORD_CHANGE", ipAddress);
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        // Send confirmation email
+        notificationService.sendPasswordChangeConfirmationEmail(user.getEmail(), user.getFirstName());
+
+        // Log the action
+        auditService.logAction("PASSWORD_CHANGED", "User", user.getId(),
+                "Password changed successfully from IP: " + ipAddress);
+
+        log.info("Password changed successfully for user: {}", user.getEmail());
     }
 }

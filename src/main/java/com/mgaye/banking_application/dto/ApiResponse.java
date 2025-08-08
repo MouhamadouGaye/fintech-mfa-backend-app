@@ -1,5 +1,7 @@
 package com.mgaye.banking_application.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,7 @@ public class ApiResponse<T> {
         this.success = success;
         this.message = message;
         this.data = data;
-        this.timestamp = java.time.LocalDateTime.now().toString();
+        this.timestamp = LocalDateTime.now().toString();
     }
 
     public static <T> ApiResponse<T> success(T data) {

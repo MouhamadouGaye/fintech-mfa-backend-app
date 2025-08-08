@@ -4,6 +4,9 @@ import com.mgaye.banking_application.entity.Role;
 import com.mgaye.banking_application.entity.User;
 import com.mgaye.banking_application.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -20,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
         // Create admin user if doesn't exist
         if (!userRepository.existsByUsername("admin")) {
             User admin = new User();
-            admin.setUsername("admin");
+            admin.setUsername(admin.getFirstName() + admin.getLastName());
             admin.setEmail("admin@bank.com");
             admin.setPassword(passwordEncoder.encode("Admin@123"));
             admin.setFirstName("System");
@@ -45,7 +48,7 @@ public class DataInitializer implements CommandLineRunner {
             customer.setLastName("Doe");
             customer.setPhoneNumber("+1234567890");
             customer.setAddress("123 Main St, City, State");
-            customer.setDateOfBirth("1990-01-01");
+            customer.setDateOfBirth(LocalDate.parse("1990-01-01"));
             customer.setRole(Role.CUSTOMER);
             customer.setIsActive(true);
             customer.setIsVerified(true);

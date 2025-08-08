@@ -1,0 +1,98 @@
+<!-- templates/email/account-locked.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Account Temporarily Locked</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background: #ffc107;
+        color: #212529;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 20px;
+        background: #f9f9f9;
+      }
+      .alert {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+      .footer {
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🔒 Account Security Alert</h1>
+      </div>
+      <div class="content">
+        <h2>Hi <span th:text="${user.firstName}">User</span>,</h2>
+
+        <div class="alert">
+          <strong>Your account has been temporarily locked</strong> due to
+          multiple failed login attempts for security reasons.
+        </div>
+
+        <p><strong>Account Details:</strong></p>
+        <ul>
+          <li>Email: <span th:text="${user.email}">user@example.com</span></li>
+          <li>
+            Locked until:
+            <span
+              th:text="${#temporals.format(lockoutTime, 'MMM dd, yyyy HH:mm')}"
+              >Lockout Time</span
+            >
+          </li>
+        </ul>
+
+        <p><strong>What happened?</strong></p>
+        <p>
+          We detected multiple failed login attempts to your account. As a
+          security measure, we've temporarily locked your account to prevent
+          unauthorized access.
+        </p>
+
+        <p><strong>What should you do?</strong></p>
+        <ul>
+          <li>Wait until the lockout period expires (30 minutes)</li>
+          <li>Make sure you're using the correct password</li>
+          <li>If you forgot your password, use the "Forgot Password" option</li>
+          <li>If you suspect unauthorized access, contact us immediately</li>
+        </ul>
+
+        <p><strong>Need help?</strong></p>
+        <p>
+          If you believe this is an error or if you need assistance, please
+          contact our security team at
+          <a href="mailto:security@banking.example.com"
+            >security@banking.example.com</a
+          >
+        </p>
+      </div>
+      <div class="footer">
+        <p>&copy; 2025 Banking System. All rights reserved.</p>
+        <p>This is an automated security message, please do not reply.</p>
+      </div>
+    </div>
+  </body>
+</html>
