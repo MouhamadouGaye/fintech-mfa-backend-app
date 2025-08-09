@@ -18,6 +18,7 @@ public class AuthenticationResponse {
     private String refreshToken;
     private UserDto user;
     private Long expiresIn;
+    private String tokenType;
     private Boolean requiresMfa = false;
     private Boolean requiresDeviceVerification = false;
     private Boolean requiresPasswordChange = false;

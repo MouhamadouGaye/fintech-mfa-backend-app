@@ -37,7 +37,7 @@ public class PasswordService {
         }
 
         if (!password.matches(".*[a-z].*")) {
-            throw new WeakPasswordException("Password must contain at least one lowercase letter");
+            throw new WeakPasswordException("Password must contain atwx least one lowercase letter");
         }
 
         if (!password.matches(".*\\d.*")) {
@@ -52,6 +52,14 @@ public class PasswordService {
         if (isCommonPassword(password)) {
             throw new WeakPasswordException("Password is too common. Please choose a stronger password");
         }
+    }
+
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public String encode(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
     public void validatePasswordHistory(User user, String newPassword) {
@@ -82,4 +90,5 @@ public class PasswordService {
                 "password123", "admin", "letmein", "welcome", "monkey");
         return commonPasswords.contains(password.toLowerCase());
     }
+
 }

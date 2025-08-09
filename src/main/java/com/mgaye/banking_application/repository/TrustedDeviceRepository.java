@@ -17,6 +17,9 @@ public interface TrustedDeviceRepository extends JpaRepository<TrustedDevice, Lo
 
     Optional<TrustedDevice> findByUserAndDeviceIdAndIsActiveTrue(User user, String deviceId);
 
+    Optional<TrustedDevice> findByUserAndDeviceFingerprintAndIsActiveTrue(User user, String deviceFingerprint,
+            Boolean isActive);
+
     List<TrustedDevice> findByUserAndIsActiveTrueOrderByLastUsedAtDesc(User user);
 
     @Query("SELECT t FROM TrustedDevice t WHERE t.expiresAt < :now AND t.isActive = true")

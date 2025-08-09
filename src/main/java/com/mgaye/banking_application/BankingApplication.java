@@ -1,6 +1,6 @@
 package com.mgaye.banking_application;
 
-// BankingApplication.java
+// BankingApplication.$`ù
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

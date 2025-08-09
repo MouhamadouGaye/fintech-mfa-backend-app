@@ -1,5 +1,6 @@
 package com.mgaye.banking_application.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.mgaye.banking_application.entity.MfaMethod;
@@ -20,4 +21,7 @@ public class MfaSetupResponse {
     private List<String> backupCodes;
     private MfaMethod method;
     private Boolean requiresBackupCodes;
+    private Boolean requiresVerification;
+    private int expirationMinutes;
+    private String maskedContact;
 }

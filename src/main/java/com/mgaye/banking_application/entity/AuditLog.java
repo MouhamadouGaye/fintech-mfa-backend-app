@@ -98,17 +98,21 @@ public class AuditLog {
     @Column(name = "entity_type")
     private String entityType;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(name = "timestamp", nullable = false, columnDefinition = "timestamp(6) Default now()")
     private LocalDateTime timestamp;
 
     @Column(name = "details", columnDefinition = "TEXT")
     private String details;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(255) Default 'PARTIAL'")
     @Enumerated(EnumType.STRING)
     private AuditStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP(6) Default now()")
+    private LocalDateTime createdAt;
 }

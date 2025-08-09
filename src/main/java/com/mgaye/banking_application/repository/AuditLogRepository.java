@@ -27,9 +27,21 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
                         @Param("endDate") LocalDateTime endDate,
                         Pageable pageable);
 
-        @Query("SELECT a FROM AuditLog a WHERE a.userId = :userId AND a.createdAt BETWEEN :startDate AND :endDate " +
-                        "ORDER BY a.createdAt DESC")
-        List<AuditLog> findUserAuditLogsByDateRange(@Param("userId") Long userId,
+        // @Query("SELECT a FROM AuditLog a WHERE a.userId = :userId AND a.createdAt
+        // BETWEEN :startDate AND :endDate " +
+        // "ORDER BY a.createdAt DESC")
+        // List<AuditLog> findUserAuditLogsByDateRange(@Param("userId") Long userId,
+        // @Param("startDate") LocalDateTime startDate,
+        // @Param("endDate") LocalDateTime endDate);
+
+        @Query("""
+                            SELECT a FROM AuditLog a
+                            WHERE a.user.id = :userId
+                              AND a.createdAt BETWEEN :startDate AND :endDate
+                            ORDER BY a.createdAt DESC
+                        """)
+        List<AuditLog> findUserAuditLogsByDateRange(
+                        @Param("userId") Long userId,
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
 

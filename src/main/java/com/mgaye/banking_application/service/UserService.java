@@ -433,6 +433,28 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
+    // public UserResponseDto getUserById(Long id){
+    // User user = userRepository.getById(id)
+    // .orElseThrow(() -> new UserNotFoundException("User not found with username: "
+    // + user));
+
+    // return UserResponseDto.fromUser(user);
+    // }
+
+    // public List<UserResponseDto> getAllUsers(Long id) {
+    // List<User> user = userRepository.findAll()
+    // .orElseThrow(() -> UserNotFoundException("User not found with username: " +
+    // user));
+
+    // return UserResponseDto.fromUser(user);
+    // }
+
+    public UserResponseDto getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        return UserResponseDto.fromUser(user);
+    }
+
     public void verifyEmail(String token, String ipAddress) {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));

@@ -6,29 +6,37 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.auth.InvalidCredentialsException;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mgaye.banking_application.dto.response.MfaSetupResponse;
 import com.mgaye.banking_application.entity.MfaMethod;
 import com.mgaye.banking_application.entity.User;
+import com.mgaye.banking_application.exception.InvalidCredentialsException;
+import com.mgaye.banking_application.exception.InvalidMfaCodeException;
 import com.mgaye.banking_application.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MfaService {
 
     private final TotpManager totpManager;
     private final SmsService smsService;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
-    public MfaService(TotpManager totpManager, SmsService smsService, EmailService emailService) {
-        this.totpManager = totpManager;
-        this.smsService = smsService;
-        this.emailService = emailService;
-    }
+    // public MfaService(TotpManager totpManager, SmsService smsService,
+    // EmailService emailService, PasswordEncoder passwordEncoder) {
+    // this.totpManager = totpManager;
+    // this.smsService = smsService;
+    // this.emailService = emailService;
+    // this.passwordEncoder = passwordEncoder;
+    // }
 
     public String generateMfaSecret() {
         return totpManager.generateSecret();

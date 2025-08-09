@@ -31,51 +31,55 @@ public class AdminController {
     private final AccountService accountService;
     private final AuditService auditService;
 
-    // User Management
-    @GetMapping("/users")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
-        try {
-            List<UserResponseDto> users = userService.getAllUsers();
-            return ResponseEntity.ok(ApiResponse.success(users));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(e.getMessage()));
-        }
-    }
+    // // User Management
+    // @GetMapping("/users")
+    // public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
+    // try {
+    // List<UserResponseDto> users = userService.getAllUsers();
+    // return ResponseEntity.ok(ApiResponse.success(users));
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest()
+    // .body(ApiResponse.error(e.getMessage()));
+    // }
+    // }
 
-    @GetMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable Long id) {
-        try {
-            UserResponseDto user = userService.getUserById(id);
-            return ResponseEntity.ok(ApiResponse.success(user));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    // @GetMapping("/users/{id}")
+    // public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable
+    // Long id) {
+    // try {
+    // UserResponseDto user = userService.getUserById(id);
+    // return ResponseEntity.ok(ApiResponse.success(user));
+    // } catch (Exception e) {
+    // return ResponseEntity.notFound().build();
+    // }
+    // }
 
-    @PutMapping("/users/{id}/lock")
-    public ResponseEntity<ApiResponse<String>> lockUser(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "24") int hours) {
-        try {
-            userService.lockUser(id, hours);
-            return ResponseEntity.ok(ApiResponse.success("User locked successfully", null));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(e.getMessage()));
-        }
-    }
+    // @PutMapping("/users/{id}/lock")
+    // public ResponseEntity<ApiResponse<String>> lockUser(
+    // @PathVariable Long id,
+    // @RequestParam(defaultValue = "24") int hours) {
+    // try {
+    // userService.lockUser(id, hours);
+    // return ResponseEntity.ok(ApiResponse.success("User locked successfully",
+    // null));
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest()
+    // .body(ApiResponse.error(e.getMessage()));
+    // }
+    // }
 
-    @PutMapping("/users/{id}/unlock")
-    public ResponseEntity<ApiResponse<String>> unlockUser(@PathVariable Long id) {
-        try {
-            userService.unlockUser(id);
-            return ResponseEntity.ok(ApiResponse.success("User unlocked successfully", null));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(e.getMessage()));
-        }
-    }
+    // @PutMapping("/users/{id}/unlock")
+    // public ResponseEntity<ApiResponse<String>> unlockUser(@PathVariable Long id)
+    // {
+    // try {
+    // userService.unlockUser(id);
+    // return ResponseEntity.ok(ApiResponse.success("User unlocked successfully",
+    // null));
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest()
+    // .body(ApiResponse.error(e.getMessage()));
+    // }
+    // }
 
     // Account Management
     @PutMapping("/accounts/{id}/balance")

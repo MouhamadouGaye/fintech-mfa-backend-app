@@ -643,25 +643,27 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("MFA enabled successfully"));
     }
 
-    @PostMapping("/mfa/disable")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<MessageResponse> disableMfa(
-            @Valid @RequestBody DisableMfaRequest request,
-            HttpServletRequest httpRequest,
-            Authentication authentication) {
+    // @PostMapping("/mfa/disable")
+    // @PreAuthorize("isAuthenticated()")
+    // public ResponseEntity<MessageResponse> disableMfa(
+    // @Valid @RequestBody DisableMfaRequest request,
+    // HttpServletRequest httpRequest,
+    // Authentication authentication) {
 
-        User user = (User) authentication.getPrincipal();
-        mfaService.disableMfa(user, request.getPassword(), getClientIpAddress(httpRequest));
-        return ResponseEntity.ok(new MessageResponse("MFA disabled successfully"));
-    }
+    // User user = (User) authentication.getPrincipal();
+    // mfaService.disableMfa(user, request.getPassword(),
+    // getClientIpAddress(httpRequest));
+    // return ResponseEntity.ok(new MessageResponse("MFA disabled successfully"));
+    // }
 
-    @GetMapping("/mfa/backup-codes")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<BackupCodesResponse> getBackupCodes(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        List<String> codes = mfaService.generateBackupCodes(user);
-        return ResponseEntity.ok(new BackupCodesResponse(codes));
-    }
+    // @GetMapping("/mfa/backup-codes")
+    // @PreAuthorize("isAuthenticated()")
+    // public ResponseEntity<BackupCodesResponse> getBackupCodes(Authentication
+    // authentication) {
+    // User user = (User) authentication.getPrincipal();
+    // List<String> codes = mfaService.generateBackupCodes(user);
+    // return ResponseEntity.ok(new BackupCodesResponse(codes));
+    // }
 
     private String getClientIpAddress(HttpServletRequest request) {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");

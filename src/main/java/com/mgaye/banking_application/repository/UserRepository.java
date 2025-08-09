@@ -1,5 +1,6 @@
 package com.mgaye.banking_application.repository;
 
+import com.mgaye.banking_application.dto.UserResponseDto;
 import com.mgaye.banking_application.entity.KycStatus;
 import com.mgaye.banking_application.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,50 +37,54 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUsername(String username);
+        Optional<User> findByUsername(String username);
 
-    Optional<User> findByEmail(String email);
+        Optional<User> findById(Long id);
 
-    boolean existsByUsername(String username);
+        List<User> findAll();
 
-    boolean existsByEmail(String email);
+        Optional<User> findByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.isActive = true")
-    List<User> findActiveUsers();
+        boolean existsByUsername(String username);
 
-    @Query("SELECT u FROM User u WHERE u.accountLockedUntil IS NOT NULL AND u.accountLockedUntil > :now")
-    List<User> findLockedUsers(@Param("now") LocalDateTime now);
+        boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.createdAt BETWEEN :startDate AND :endDate")
-    List<User> findUsersByCreationDateRange(@Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT u FROM User u WHERE u.isActive = true")
+        List<User> findActiveUsers();
 
-    Optional<User> findByEmailIgnoreCase(String email);
+        @Query("SELECT u FROM User u WHERE u.accountLockedUntil IS NOT NULL AND u.accountLockedUntil > :now")
+        List<User> findLockedUsers(@Param("now") LocalDateTime now);
 
-    boolean existsByEmailIgnoreCase(String email);
+        @Query("SELECT u FROM User u WHERE u.createdAt BETWEEN :startDate AND :endDate")
+        List<User> findUsersByCreationDateRange(@Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 
-    Optional<User> findByVerificationToken(String token);
+        Optional<User> findByEmailIgnoreCase(String email);
 
-    Optional<User> findByPasswordResetToken(String token);
+        boolean existsByEmailIgnoreCase(String email);
 
-    boolean existsByNationalId(String nationalId);
+        Optional<User> findByVerificationToken(String token);
 
-    @Query("SELECT u FROM User u WHERE u.email = ?1 AND u.isActive = true AND u.isVerified = true")
-    Optional<User> findActiveVerifiedUserByEmail(String email);
+        Optional<User> findByPasswordResetToken(String token);
 
-    @Query("SELECT u FROM User u WHERE u.accountLockedUntil < :now")
-    List<User> findUsersWithExpiredLocks(@Param("now") LocalDateTime now);
+        boolean existsByNationalId(String nationalId);
 
-    @Query("SELECT u FROM User u WHERE u.passwordExpiresAt < :now AND u.isActive = true")
-    List<User> findUsersWithExpiredPasswords(@Param("now") LocalDateTime now);
+        @Query("SELECT u FROM User u WHERE u.email = ?1 AND u.isActive = true AND u.isVerified = true")
+        Optional<User> findActiveVerifiedUserByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.lastLoginAt < :cutoffDate AND u.isActive = true")
-    List<User> findInactiveUsers(@Param("cutoffDate") LocalDateTime cutoffDate);
+        @Query("SELECT u FROM User u WHERE u.accountLockedUntil < :now")
+        List<User> findUsersWithExpiredLocks(@Param("now") LocalDateTime now);
 
-    @Query("SELECT u FROM User u WHERE u.kycStatus = :status")
-    List<User> findByKycStatus(@Param("status") KycStatus status);
+        @Query("SELECT u FROM User u WHERE u.passwordExpiresAt < :now AND u.isActive = true")
+        List<User> findUsersWithExpiredPasswords(@Param("now") LocalDateTime now);
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt < :endDate")
-    long countNewUsersInPeriod(@Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT u FROM User u WHERE u.lastLoginAt < :cutoffDate AND u.isActive = true")
+        List<User> findInactiveUsers(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+        @Query("SELECT u FROM User u WHERE u.kycStatus = :status")
+        List<User> findByKycStatus(@Param("status") KycStatus status);
+
+        @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt < :endDate")
+        long countNewUsersInPeriod(@Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 }

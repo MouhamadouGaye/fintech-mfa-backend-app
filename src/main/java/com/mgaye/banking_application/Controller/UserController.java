@@ -98,16 +98,17 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("Trusted device removed successfully"));
     }
 
-    @GetMapping("/security-alerts")
-    public ResponseEntity<List<SecurityAlertDto>> getSecurityAlerts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            Authentication authentication) {
+    // @GetMapping("/security-alerts")
+    // public ResponseEntity<List<SecurityAlertDto>> getSecurityAlerts(
+    // @RequestParam(defaultValue = "0") int page,
+    // @RequestParam(defaultValue = "20") int size,
+    // Authentication authentication) {
 
-        User user = (User) authentication.getPrincipal();
-        List<SecurityAlertDto> alerts = securityService.getUserAlerts(user, page, size);
-        return ResponseEntity.ok(alerts);
-    }
+    // User user = (User) authentication.getPrincipal();
+    // List<SecurityAlertDto> alerts = securityService.getUserAlerts(user, page,
+    // size);
+    // return ResponseEntity.ok(alerts);
+    // }
 
     @PostMapping("/security-alerts/{alertId}/acknowledge")
     public ResponseEntity<MessageResponse> acknowledgeAlert(

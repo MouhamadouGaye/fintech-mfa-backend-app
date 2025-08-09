@@ -39,6 +39,9 @@ public class LoginAttempt {
     @Column(name = "attempt_time", nullable = false)
     private LocalDateTime attemptTime;
 
+    @Column(name = "details", length = 500)
+    private String details;
+
     @Column(name = "success", nullable = false)
     private Boolean success;
 
@@ -55,7 +58,7 @@ public class LoginAttempt {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void isSuccesful(Boolean success) {
+    public void isSuccessful(Boolean success) {
         this.success = success;
     }
 }

@@ -219,7 +219,7 @@ public class User {
     private String loginSource; // WEB, MOBILE, API
 
     // ✅ Enhanced MFA Support
-    @Column(name = "is_mfa_enabled", nullable = false)
+    @Column(name = "is_mfa_enabled", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean isMfaEnabled = false;
 
@@ -256,11 +256,11 @@ public class User {
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
 
-    @Column(name = "email_notifications_enabled", nullable = false)
+    @Column(name = "email_notifications_enabled", nullable = false, columnDefinition = "Boolean Default true")
     @Builder.Default
     private Boolean emailNotificationsEnabled = true;
 
-    @Column(name = "sms_notifications_enabled", nullable = false)
+    @Column(name = "sms_notifications_enabled", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean smsNotificationsEnabled = false;
 
@@ -271,7 +271,7 @@ public class User {
     @Column(name = "password_expires_at")
     private LocalDateTime passwordExpiresAt;
 
-    @Column(name = "force_password_change", nullable = false)
+    @Column(name = "force_password_change", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean forcePasswordChange = false;
 
@@ -282,7 +282,7 @@ public class User {
     @Column(name = "national_id", unique = true, length = 50)
     private String nationalId;
 
-    @Column(name = "kyc_status", nullable = false)
+    @Column(name = "kyc_status", nullable = false, columnDefinition = "VARCHAR(255) Default 'PENDING'")
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private KycStatus kycStatus = KycStatus.PENDING;
@@ -293,13 +293,13 @@ public class User {
     @Column(name = "kyc_verified_by", length = 100)
     private String kycVerifiedBy;
 
-    @Column(name = "risk_level", nullable = false)
+    @Column(name = "risk_level", nullable = false, columnDefinition = "VARCHAR(20) Default 'LOW'")
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private RiskLevel riskLevel = RiskLevel.LOW;
 
     // ✅ Account Status & Compliance
-    @Column(name = "is_suspended", nullable = false)
+    @Column(name = "is_suspended", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean isSuspended = false;
 
@@ -312,7 +312,7 @@ public class User {
     @Column(name = "suspended_by", length = 100)
     private String suspendedBy;
 
-    @Column(name = "is_frozen", nullable = false)
+    @Column(name = "is_frozen", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean isFrozen = false;
 
@@ -320,28 +320,28 @@ public class User {
     private String freezeReason;
 
     // ✅ Compliance & Monitoring
-    @Column(name = "aml_status", nullable = false)
+    @Column(name = "aml_status", nullable = false, columnDefinition = "VARCHAR(255) Default 'CLEAR'")
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private AmlStatus amlStatus = AmlStatus.CLEAR;
 
-    @Column(name = "sanctions_checked", nullable = false)
+    @Column(name = "sanctions_checked", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean sanctionsChecked = false;
 
     @Column(name = "sanctions_check_date")
     private LocalDateTime sanctionsCheckDate;
 
-    @Column(name = "pep_status", nullable = false)
+    @Column(name = "pep_status", nullable = false, columnDefinition = "Boolean Default false")
     @Builder.Default
     private Boolean pepStatus = false; // Politically Exposed Person
 
     // ✅ Session & Device Management
-    @Column(name = "session_timeout_minutes", nullable = false)
+    @Column(name = "session_timeout_minutes", nullable = false, columnDefinition = "Integer Default 30")
     @Builder.Default
     private Integer sessionTimeoutMinutes = 30;
 
-    @Column(name = "max_concurrent_sessions", nullable = false)
+    @Column(name = "max_concurrent_sessions", nullable = false, columnDefinition = "Integer Default 3")
     @Builder.Default
     private Integer maxConcurrentSessions = 3;
 
@@ -399,5 +399,10 @@ public class User {
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public User orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
     }
 }

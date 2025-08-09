@@ -22,16 +22,20 @@ import com.mgaye.banking_application.entity.User;
 import com.mgaye.banking_application.entity.UserSession;
 import com.mgaye.banking_application.exception.AccountFrozenException;
 import com.mgaye.banking_application.exception.AccountLockedException;
+import com.mgaye.banking_application.exception.AccountNotActiveException;
 import com.mgaye.banking_application.exception.AccountNotVerifiedException;
 import com.mgaye.banking_application.exception.AccountSuspendedException;
 import com.mgaye.banking_application.exception.ComplianceException;
 import com.mgaye.banking_application.exception.InvalidTokenException;
+import com.mgaye.banking_application.exception.LogoutException;
 import com.mgaye.banking_application.exception.PasswordChangeRequiredException;
 import com.mgaye.banking_application.exception.TooManyAttemptsException;
 import com.mgaye.banking_application.exception.UserAlreadyExistsException;
 import com.mgaye.banking_application.repository.UserRepository;
+import com.mgaye.banking_application.security.JwtService;
 import com.mgaye.banking_application.security.JwtTokenProvider;
 import com.mgaye.banking_application.utility.ClientIpAddress;
+import com.twilio.jwt.Jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -43,10 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final PasswordService passwordService;
     private final JwtTokenProvider jwtTokenProvider;
-
     private final EmailService emailService;
     private final SmsService smsService;
     private final SecurityService securityService;
@@ -57,15 +59,17 @@ public class AuthenticationService {
     private final TokenService tokenService;
     private final LoginAttemptService loginAttemptService;
     private final ClientIpAddress clientIpAddress;
+    private final JwtService jwtService;
+    private final SessionService sessionService;
 
     public AuthenticationService(UserRepository userRepository,
-            PasswordEncoder passwordEncoder, PasswordService passwordService,
+            PasswordService passwordService,
             JwtTokenProvider jwtTokenProvider, EmailService emailService, SmsService smsService,
             SecurityService securityService, AuditService auditService, RateLimitService rateLimitService,
             DeviceService deviceService, MfaService mfaService, TokenService tokenService,
-            LoginAttemptService loginAttenptService, ClientIpAddress clientIpAddress) {
+            LoginAttemptService loginAttenptService, ClientIpAddress clientIpAddress, JwtService jwtService,
+            SessionService sesseionService, LoginAttemptService loginAttemptService, SessionService sessionService) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.passwordService = passwordService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.emailService = emailService;
@@ -78,6 +82,8 @@ public class AuthenticationService {
         this.tokenService = tokenService;
         this.loginAttemptService = loginAttemptService;
         this.clientIpAddress = clientIpAddress;
+        this.jwtService = jwtService;
+        this.sessionService = sessionService;
     }
 
     // ✅ Email-based Authentication
@@ -103,7 +109,7 @@ public class AuthenticationService {
             validateAccountForLogin(user, ipAddress, userAgent);
 
             // Password verification
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            if (!passwordService.matches(request.getPassword(), user.getPassword())) {
                 handleFailedLogin(user, ipAddress, "Invalid password");
                 throw new BadCredentialsException("Invalid email or password");
             }
@@ -268,7 +274,7 @@ public class AuthenticationService {
         // Create user
         User user = User.builder()
                 .email(email)
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordService.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber())
@@ -355,7 +361,7 @@ public class AuthenticationService {
 
             // Update last login info
             user.setLastLoginAt(LocalDateTime.now());
-            user.setLastLoginIp(deviceService.getClientIpAddress(request));
+            user.setLastLoginIp(clientIpAddress.getClientIpAddress(request));
             userRepository.save(user);
 
             // Log the action
@@ -394,5 +400,56 @@ public class AuthenticationService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    // Add the missing logout methods
+    public void logout(User user, String sessionId, String ipAddress) {
+        try {
+            // Find and invalidate the specific session
+            if (sessionId != null) {
+                sessionService.invalidateSession(user, sessionId);
+            }
+
+            // Log the action
+            auditService.logAction("USER_LOGOUT", "User", user.getId(),
+                    String.format("User %s logged out from IP: %s", user.getUsername(), ipAddress));
+
+            log.info("User {} logged out successfully from IP: {}", user.getUsername(), ipAddress);
+
+        } catch (Exception e) {
+            log.error("Error during logout for user: {} from IP: {}", user.getUsername(), ipAddress, e);
+            throw new LogoutException("Failed to logout user");
+        }
+    }
+
+    public void logoutAllSessions(User user, String ipAddress) {
+        try {
+            // Invalidate all active sessions for the user
+            sessionService.invalidateAllUserSessions(user);
+
+            // Log the action
+            auditService.logAction("USER_LOGOUT_ALL", "User", user.getId(),
+                    String.format("User %s logged out from all devices from IP: %s", user.getUsername(), ipAddress));
+
+            log.info("User {} logged out from all sessions from IP: {}", user.getUsername(), ipAddress);
+
+        } catch (Exception e) {
+            log.error("Error during logout all sessions for user: {} from IP: {}", user.getUsername(), ipAddress, e);
+            throw new LogoutException("Failed to logout user from all sessions");
+        }
+    }
+
+    private UserDto convertToUserDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRole())
+                .isActive(user.getIsActive())
+                .isVerified(user.getIsVerified())
+                .isMfaEnabled(user.getIsMfaEnabled())
+                .build();
     }
 }

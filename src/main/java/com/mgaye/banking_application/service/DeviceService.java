@@ -1,7 +1,11 @@
 package com.mgaye.banking_application.service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +23,10 @@ import com.mgaye.banking_application.repository.TrustedDeviceRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+// ===============================================
+// 2. Device Service - Fix DigestUtils issue
+// ===============================================
 
 @Service
 @Slf4j
@@ -45,72 +53,36 @@ public class DeviceService {
                 .build();
     }
 
-    public boolean isKnownDevice(User user, DeviceInfo deviceInfo) {
-        return trustedDeviceRepository
-                .findByUserAndDeviceIdAndIsActiveTrue(user, deviceInfo.getDeviceId())
-                .isPresent();
-    }
-
-    public void sendDeviceVerificationCode(User user, DeviceInfo deviceInfo) {
-        String code = RandomStringUtils.randomNumeric(6);
-        String key = "device_verification:" + user.getId() + ":" + deviceInfo.getDeviceId();
-
-        redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(10));
-        emailService.sendDeviceVerificationEmail(user, code, deviceInfo);
-    }
-
-    public boolean verifyDeviceCode(User user, String code) {
-        String key = "device_verification:" + user.getId() + ":*";
-        Set<String> keys = redisTemplate.keys(key);
-
-        for (String k : keys) {
-            String storedCode = redisTemplate.opsForValue().get(k);
-            if (code.equals(storedCode)) {
-                redisTemplate.delete(k);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void trustDevice(User user, DeviceInfo deviceInfo) {
-        TrustedDevice device = new TrustedDevice();
-        device.setUser(user);
-        device.setDeviceId(deviceInfo.getDeviceId());
-        device.setDeviceName(generateDeviceName(deviceInfo));
-        device.setDeviceType(deviceInfo.getDeviceType());
-        device.setBrowser(deviceInfo.getBrowser());
-        device.setOperatingSystem(deviceInfo.getOperatingSystem());
-        device.setIpAddress(deviceInfo.getIpAddress());
-        device.setTrustedAt(LocalDateTime.now());
-        device.setLastUsedAt(LocalDateTime.now());
-        device.setExpiresAt(LocalDateTime.now().plusDays(90));
-
-        trustedDeviceRepository.save(device);
-    }
-
     private String generateDeviceFingerprint(HttpServletRequest request) {
         StringBuilder fingerprint = new StringBuilder();
         fingerprint.append(request.getHeader("User-Agent"));
         fingerprint.append(request.getHeader("Accept-Language"));
         fingerprint.append(request.getHeader("Accept-Encoding"));
 
-        return DigestUtils.sha256Hex(fingerprint.toString());
+        // Use MessageDigest instead of DigestUtils
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(fingerprint.toString().getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            log.error("SHA-256 algorithm not available", e);
+            // Fallback to simple hash
+            return String.valueOf(fingerprint.toString().hashCode());
+        }
     }
 
-    private String generateDeviceName(DeviceInfo deviceInfo) {
-        return deviceInfo.getBrowser() + " on " + deviceInfo.getOperatingSystem();
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
     }
-
-    // 1. Create the missing getClientIpAddress utility method
-    // Add this as a private method to your SessionService, DeviceService, and
-    // AuthService classes
 
     private String getClientIpAddress(HttpServletRequest request) {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");
         if (xForwardedForHeader != null && !xForwardedForHeader.isEmpty()
                 && !"unknown".equalsIgnoreCase(xForwardedForHeader)) {
-            // X-Forwarded-For can contain multiple IPs, take the first one
             return xForwardedForHeader.split(",")[0].trim();
         }
 
@@ -119,22 +91,60 @@ public class DeviceService {
             return xRealIpHeader;
         }
 
-        String xForwardedHeader = request.getHeader("X-Forwarded");
-        if (xForwardedHeader != null && !xForwardedHeader.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedHeader)) {
-            return xForwardedHeader;
-        }
-
-        String forwardedForHeader = request.getHeader("Forwarded-For");
-        if (forwardedForHeader != null && !forwardedForHeader.isEmpty()
-                && !"unknown".equalsIgnoreCase(forwardedForHeader)) {
-            return forwardedForHeader;
-        }
-
-        String forwardedHeader = request.getHeader("Forwarded");
-        if (forwardedHeader != null && !forwardedHeader.isEmpty() && !"unknown".equalsIgnoreCase(forwardedHeader)) {
-            return forwardedHeader;
-        }
-
         return request.getRemoteAddr();
+    }
+
+    public boolean isKnownDevice(User user, DeviceInfo deviceInfo) {
+        return trustedDeviceRepository
+                .findByUserAndDeviceFingerprintAndIsActiveTrue(user, deviceInfo.getDeviceName(), user.getIsActive())
+                .isPresent();
+    }
+
+    public void sendDeviceVerificationCode(User user, DeviceInfo deviceInfo) {
+        String code = generateVerificationCode();
+        String key = "device_verification:" + user.getId() + ":" + deviceInfo.getDeviceId();
+
+        // Store in Redis for 10 minutes
+        redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(10));
+
+        // Send email with verification code
+        emailService.sendDeviceVerificationEmail(user, code, deviceInfo);
+    }
+
+    public boolean verifyDeviceCode(User user, String code) {
+        String key = "device_verification:" + user.getId() + ":*";
+        Set<String> keys = redisTemplate.keys(key);
+
+        for (String redisKey : keys) {
+            String storedCode = redisTemplate.opsForValue().get(redisKey);
+            if (code.equals(storedCode)) {
+                redisTemplate.delete(redisKey);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void trustDevice(User user, DeviceInfo deviceInfo) {
+        TrustedDevice device = TrustedDevice.builder()
+                .user(user)
+                .deviceFingerprint(deviceInfo.getDeviceId())
+                .deviceName(generateDeviceName(deviceInfo))
+                .deviceType(deviceInfo.getDeviceType())
+                .browser(deviceInfo.getBrowser())
+                .operatingSystem(deviceInfo.getOperatingSystem())
+                .ipAddress(deviceInfo.getIpAddress())
+                .isActive(true)
+                .build();
+
+        trustedDeviceRepository.save(device);
+    }
+
+    private String generateDeviceName(DeviceInfo deviceInfo) {
+        return String.format("%s on %s", deviceInfo.getBrowser(), deviceInfo.getOperatingSystem());
+    }
+
+    private String generateVerificationCode() {
+        return String.format("%06d", new Random().nextInt(999999));
     }
 }

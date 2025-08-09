@@ -2,6 +2,7 @@ package com.mgaye.banking_application.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,8 @@ public class LoginAttemptService {
                 .email(email)
                 .ipAddress(ipAddress)
                 .userAgent(userAgent)
-                .successful(successful)
-                .timestamp(LocalDateTime.now())
+                .success(successful)
+                .attemptTime(LocalDateTime.now())
                 .details(details)
                 .build();
 
@@ -51,7 +52,7 @@ public class LoginAttemptService {
 
         if (value != null) {
             LoginAttempt attempt = convertFromJson(value);
-            return !attempt.isSuccessful();
+            return !attempt.getSuccess();
         }
 
         return false;
@@ -70,19 +71,23 @@ public class LoginAttemptService {
     }
 
     private String convertToJson(LoginAttempt attempt) {
-        // Simple JSON conversion - you might want to use ObjectMapper
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         return String.format(
                 "{\"email\":\"%s\",\"ipAddress\":\"%s\",\"userAgent\":\"%s\",\"successful\":%b,\"timestamp\":\"%s\",\"details\":\"%s\"}",
-                attempt.getEmail(), attempt.getIpAddress(), attempt.getUserAgent(),
-                attempt.isSuccessful(), attempt.getTimestamp(), attempt.getDetails());
+                attempt.getEmail(),
+                attempt.getIpAddress(),
+                attempt.getUserAgent(),
+                attempt.getSuccess(), // Must be boolean
+                attempt.getAttemptTime().format(formatter),
+                attempt.getDetails());
     }
 
     private LoginAttempt convertFromJson(String json) {
         // Simple JSON parsing - you might want to use ObjectMapper
         // This is a simplified implementation
         return LoginAttempt.builder()
-                .successful(json.contains("\"successful\":true"))
-                .timestamp(LocalDateTime.now()) // Simplified
+                .success(json.contains("\"successful\":true"))
+                .attemptTime(LocalDateTime.now()) // Simplified
                 .build();
     }
 }

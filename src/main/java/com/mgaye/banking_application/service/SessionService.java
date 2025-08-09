@@ -70,13 +70,6 @@ public class SessionService {
         }
     }
 
-    public void invalidateAllUserSessions(User user) {
-        List<UserSession> sessions = sessionRepository
-                .findByUserAndIsActiveTrueOrderByLastAccessedAtDesc(user);
-        sessions.forEach(session -> session.setIsActive(false));
-        sessionRepository.saveAll(sessions);
-    }
-
     // 1. Create the missing getClientIpAddress utility method
     // Add this as a private method to your SessionService, DeviceService, and
     // AuthService classes
@@ -112,4 +105,45 @@ public class SessionService {
 
         return request.getRemoteAddr();
     }
+
+    public boolean isValidSession(User user, String sessionId) {
+        Optional<UserSession> session = sessionRepository.findBySessionIdAndUser(sessionId, user);
+        if (session.isPresent()) {
+            UserSession userSession = session.get();
+            return userSession.getIsActive() &&
+                    userSession.getExpiresAt().isAfter(LocalDateTime.now());
+        }
+        return false;
+    }
+
+    public void updateSession(User user, String sessionId, String accessToken, String refreshToken) {
+        Optional<UserSession> sessionOpt = sessionRepository.findBySessionIdAndUser(sessionId, user);
+        if (sessionOpt.isPresent()) {
+            UserSession session = sessionOpt.get();
+            session.setLastAccessedAt(LocalDateTime.now());
+            // You might want to store tokens in session if needed
+            sessionRepository.save(session);
+        }
+    }
+
+    public void invalidateSession(User user, String sessionId) {
+        Optional<UserSession> sessionOpt = sessionRepository.findBySessionIdAndUser(sessionId, user);
+        if (sessionOpt.isPresent()) {
+            UserSession session = sessionOpt.get();
+            session.setIsActive(false);
+            session.setExpiresAt(LocalDateTime.now());
+            sessionRepository.save(session);
+        }
+    }
+
+    public void invalidateAllUserSessions(User user) {
+        List<UserSession> activeSessions = sessionRepository
+                .findByUserAndIsActiveTrueOrderByLastAccessedAtDesc(user);
+        activeSessions.forEach(session -> {
+            session.setIsActive(false);
+            session.setExpiresAt(LocalDateTime.now());
+        });
+        sessionRepository.saveAll(activeSessions);
+    }
+
 }

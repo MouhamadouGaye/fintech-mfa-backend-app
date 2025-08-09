@@ -188,4 +188,20 @@ RETURN NEW;
 END;
 $ language 'plpgsql';
 CREATE TRIGGER update_users_updated_at BEFORE
-UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column() -- Adding null column
+    ----------------------------------------------------- when the column has the null value--------------------------
+alter table users
+add column kyc_status varchar(255) not null default 'PENDING' check (
+        kyc_status in (
+            'PENDING',
+            'IN_PROGRESS',
+            'APPROVED',
+            'REJECTED',
+            'EXPIRED',
+            'REQUIRES_UPDATE'
+        )
+    );
+---------------
+update users
+set kyc_status = 'PENDING'
+where kyc_status is null;

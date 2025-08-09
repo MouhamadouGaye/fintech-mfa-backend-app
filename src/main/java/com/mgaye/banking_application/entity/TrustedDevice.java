@@ -12,9 +12,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Entity
 @Table(name = "trusted_devices")
 @Data
@@ -30,6 +32,8 @@ public class TrustedDevice {
 
     @Column(name = "device_name", length = 200)
     private String deviceName;
+
+    private String deviceFingerprint;
 
     @Column(name = "device_type", length = 50)
     private String deviceType;
