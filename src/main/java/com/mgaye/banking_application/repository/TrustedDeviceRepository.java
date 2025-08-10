@@ -15,9 +15,9 @@ import com.mgaye.banking_application.entity.User;
 @Repository
 public interface TrustedDeviceRepository extends JpaRepository<TrustedDevice, Long> {
 
-    Optional<TrustedDevice> findByUserAndDeviceIdAndIsActiveTrue(User user, String deviceId);
+    Optional<TrustedDevice> findByUserAndDeviceIdAndIsActive(User user, String deviceId, Boolean isActive);
 
-    Optional<TrustedDevice> findByUserAndDeviceFingerprintAndIsActiveTrue(User user, String deviceFingerprint,
+    Optional<TrustedDevice> findByUserAndDeviceFingerprintAndIsActive(User user, String deviceFingerprint,
             Boolean isActive);
 
     List<TrustedDevice> findByUserAndIsActiveTrueOrderByLastUsedAtDesc(User user);

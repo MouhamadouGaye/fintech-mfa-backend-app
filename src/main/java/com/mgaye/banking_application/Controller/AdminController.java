@@ -27,7 +27,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class AdminController {
 
-    private final UserService userService;
+ 
     private final AccountService accountService;
     private final AuditService auditService;
 

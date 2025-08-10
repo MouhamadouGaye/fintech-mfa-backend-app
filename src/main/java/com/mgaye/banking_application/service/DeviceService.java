@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 // 2. Device Service - Fix DigestUtils issue
 // ===============================================
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class DeviceService {
 
@@ -96,7 +96,7 @@ public class DeviceService {
 
     public boolean isKnownDevice(User user, DeviceInfo deviceInfo) {
         return trustedDeviceRepository
-                .findByUserAndDeviceFingerprintAndIsActiveTrue(user, deviceInfo.getDeviceName(), user.getIsActive())
+                .findByUserAndDeviceFingerprintAndIsActive(user, deviceInfo.getDeviceName(), user.getIsActive())
                 .isPresent();
     }
 

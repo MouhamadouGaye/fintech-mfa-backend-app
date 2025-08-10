@@ -23,19 +23,18 @@ import com.mgaye.banking_application.exception.EmailServiceException;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
     private final RedisTemplate<String, String> redisTemplate; // Add this field
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    public EmailService(JavaMailSender mailSender,
-            TemplateEngine templateEngine,
-            RedisTemplate<String, String> redisTemplate) {
+    public EmailService(RedisTemplate<String, String> redisTemplate, JavaMailSender mailSender,
+            TemplateEngine templateEngine) {
+        this.redisTemplate = redisTemplate;
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
-        this.redisTemplate = redisTemplate;
+
     }
 
     @Value("${app.frontend.url}")

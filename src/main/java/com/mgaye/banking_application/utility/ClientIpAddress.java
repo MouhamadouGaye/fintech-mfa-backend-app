@@ -1,7 +1,10 @@
 package com.mgaye.banking_application.utility;
 
+import org.springframework.stereotype.Service;
+
 import jakarta.servlet.http.HttpServletRequest;
 
+@Service
 public class ClientIpAddress {
 
     public String getClientIpAddress(HttpServletRequest request) {

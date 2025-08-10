@@ -20,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 public class SessionService {
 
     private final UserSessionRepository sessionRepository;
-    private final RedisTemplate<String, String> redisTemplate;
+    // private final RedisTemplate<String, String> redisTemplate;
 
-    public SessionService(UserSessionRepository sessionRepository, RedisTemplate<String, String> redisTemplate) {
+    public SessionService(UserSessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
-        this.redisTemplate = redisTemplate;
+
     }
 
     public UserSession createSession(User user, HttpServletRequest request, String token) {

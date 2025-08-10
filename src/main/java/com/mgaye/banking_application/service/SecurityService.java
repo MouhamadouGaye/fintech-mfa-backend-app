@@ -24,16 +24,14 @@ public class SecurityService {
     private final GeoLocationService geoLocationService;
     private final NotificationService notificationService;
     private final AuditService auditService;
-    private final UserRepository userRepository;
 
     public SecurityService(SecurityAlertRepository securityAlertRepository,
             GeoLocationService geoLocationService, NotificationService notificationService,
-            AuditService auditService, UserRepository userRepository) {
+            AuditService auditService) {
         this.securityAlertRepository = securityAlertRepository;
         this.geoLocationService = geoLocationService;
         this.notificationService = notificationService;
         this.auditService = auditService;
-        this.userRepository = userRepository;
     }
 
     public boolean isUnusualLocation(User user, String ipAddress) {

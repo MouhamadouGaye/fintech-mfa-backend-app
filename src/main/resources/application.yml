@@ -16,6 +16,12 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: gaye
     password: Postgres.2424
+
+
+# this is
+  redis.host: localhost
+  redis.port: 6379
+  redis.password:
     
   # h2:
   #   console:
@@ -52,7 +58,19 @@ spring:
             enable: true
 
 
+
+
+
 app:
+  jwtSecret: itrZjz8EfvXL+w+dxxhKygic2jH8sZ6fdUAJrj/GJNmdl8XfRXY0ZWGPAj6Sg1MGDcGJMKsYw1Dabaw7hv5GHA==
+  jwtExpirationInMs: 900000 # 15 minutes
+  jwtRefreshExpirationInMs: 604800000 # 7 days
+
+  frontend.url: http://localhost:8080
+  mail.from: mgayeeeeee@gmail.com
+    
+
+
 geolocation:
   enabled: true  # Set to false in development
   api:

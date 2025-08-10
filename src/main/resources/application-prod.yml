@@ -3,6 +3,12 @@ spring:
   config:
     activate:
       on-profile: prod
+
+      #Redis
+  redis.host=prod-redis: yourdomain.com
+  redis.port: 6379
+  redis.password: MyStrongProdPass123
+
       
   datasource:
     url: jdbc:postgresql://localhost:5432/banking_db

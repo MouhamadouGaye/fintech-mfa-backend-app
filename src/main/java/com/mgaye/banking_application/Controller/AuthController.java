@@ -520,7 +520,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
-    private final PasswordService passwordService;
     private final MfaService mfaService;
     private final UserService userService;
 
