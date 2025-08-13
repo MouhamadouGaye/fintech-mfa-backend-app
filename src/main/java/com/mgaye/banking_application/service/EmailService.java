@@ -38,10 +38,10 @@ public class EmailService {
     }
 
     @Value("${app.frontend.url}")
-    private String frontendUrl;
+    private String frontendUrl; // for verification link
 
     @Value("${app.mail.from}")
-    private String fromEmail;
+    private String fromEmail; // for the From: header
 
     public void sendVerificationEmail(User user) {
         try {
@@ -67,6 +67,7 @@ public class EmailService {
             log.error("Failed to send verification email to: {}", user.getEmail(), e);
             throw new EmailServiceException("Failed to send verification email");
         }
+
     }
 
     public void sendPasswordResetEmail(User user, String resetToken) {

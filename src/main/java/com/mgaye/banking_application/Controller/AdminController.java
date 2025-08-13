@@ -3,6 +3,7 @@ package com.mgaye.banking_application.Controller;
 import com.mgaye.banking_application.dto.ApiResponse;
 import com.mgaye.banking_application.dto.UserResponseDto;
 import com.mgaye.banking_application.entity.AuditLog;
+import com.mgaye.banking_application.exception.UserNotFoundException;
 import com.mgaye.banking_application.service.AccountService;
 import com.mgaye.banking_application.service.AuditService;
 import com.mgaye.banking_application.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class AdminController {
 
- 
+    private UserService userService;
     private final AccountService accountService;
     private final AuditService auditService;
 
@@ -115,4 +117,19 @@ public class AdminController {
                     .body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteUserById(@PathVariable Long id) {
+        try {
+            userService.deleteUserById(id);
+            return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("User not found"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
 }

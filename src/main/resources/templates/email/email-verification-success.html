@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Email Verified</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>🎉 Email Verified</h1>
+    <p>
+      Hi <span th:text="${user.firstName}">User</span>, your email has been
+      successfully verified.
+    </p>
+    <p>You can now log in to your account.</p>
+    <a href="/login">Go to Login</a>
+  </body>
+</html>

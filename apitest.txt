@@ -7,20 +7,115 @@ curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
 
 
 
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDgyNTkzNiwiZXhwIjoxNzU0ODI2ODM2LCJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsInRva2VuVHlwZSI6IkFDQ0VTUyJ9.isd60pRWz3-568JtyaVsQDCFWNhKjUUiNyzn7VCMG4M",
+"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDgyNTkzNiwiZXhwIjoxNzU1NDMwNzM2LCJ1c2VySWQiOjEsInRva2VuVHlwZSI6IlJFRlJFU0gifQ.Om_C7AyvgVOgmtM4NPK5jobIncsfvnwc2Be_52vEbrk",
+"user":{
+  "id":1,
+  "username":null,
+  "email":"admin@bank.com",
+  "firstName":"System",
+  "lastName":"Administrator",
+  "phoneNumber":null,
+  "dateOfBirth":null,
+  "role":"ADMIN",
+  "isActive":true,
+  "isVerified":true,
+  "isMfaEnabled":false,
+  "kycStatus":"PENDING",
+  "riskLevel":"LOW",
+  "lastLoginAt":"2025-08-10T13:38:56.9499",
+  "lastLoginIp":"0:0:0:0:0:0:0:1",
+  "createdAt":"2025-08-04T00:22:58.816606",
+  "passwordLastChanged":null,
+  "requiresPasswordChange":false},
+  "expiresIn":900,"tokenType":null,
+  "requiresMfa":null,
+  "requiresDeviceVerification":null,
+  "requiresPasswordChange":null,
+  "message":"Authentication successful",
+  "warnings":null
+  }%  
+
+
+  curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "mouhamadou.gayz@gmail.com",
+    "password": "Mouhamadou@123"
+  }'
+
+
+
 curl -X POST http://localhost:8080/banking-api/api/auth/register \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1NDI0ODYyMywiZXhwIjoxNzU0MjY2NjIzfQ.CaRNtiziJ7ljXeGirtDBjqCCrCoQ2JiwMUmm5l5JJm_43uBa2MtYB7xW5hHtzIL1IPdItQXUnIvKWL1PMYCgwA" \
   -d '{
-    "username": "Hawa",
-    "email": "hawa@example.com",
-    "firstName": "Hawa",
+    "email": "mouhamadou.gayz@gmail.com",
+    "firstName": "Mouhamadou",
     "lastName": "GAYE",
-    "password": "Hawa@123",
+    "password": "Mouhamadou@123",
     "phoneNumber": "1234577770",
     "address": "123 Main St",
-    "dateOfBirth": "2000-01-01",
-    "role": "CUSTOMER"
+    "dateOfBirth": "2004-01-01",
+    "role": "ADMIN",
+    "nationalId": "1823456789",
+    "acceptTerms": true,
+    "acceptPrivacy": true
   }'
+
+  curl -X POST http://localhost:8080/banking-api/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "mgaayeeeeee@gmail.com",
+  "firstName": "Kobe",
+  "lastName": "GAYE",
+  "password": "Kobegaye@123",
+  "phoneNumber": "1134577798",
+  "address": "145 Amethyst Malo",
+  "dateOfBirth": "2001-01-01",
+  "nationalId": "3334345546",
+  "acceptTerms": true,
+  "acceptPrivacy": true
+}'
+
+
+
+  curl -X POST http://localhost:8080/banking-api/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+  "email": "kobeameth@gmail.com",
+  "firstName": "Test",
+  "lastName": "test",
+  "password": "Test@123",
+  "phoneNumber": "19213888888",
+  "address": "145 Amethyst Malo",
+  "dateOfBirth": "2002-01-01",
+  "nationalId": "11143455460",
+  "acceptTerms": true,
+  "acceptPrivacy": true,
+  "role" : "ADMIN"
+}'
+
+
+curl -X DELETE "http://localhost:8080/banking-api/api/admin/users/" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+     -H "Content-Type: application/json"
+
+
+
+
+
+  curl -X POST "http://localhost:8080/banking-api/api/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane.doe@example.com",
+    "password": "StrongPassw0rd!",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "phoneNumber": "+1234567890",
+    "dateOfBirth": "1990-05-15",
+    "nationalId": "1234567890"
+  }'
+
 
 
 curl -X POST http://localhost:8080/banking-api/api/auth/register \

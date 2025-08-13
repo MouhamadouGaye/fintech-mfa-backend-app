@@ -7,6 +7,8 @@ import com.mgaye.banking_application.security.JwtHelper;
 import com.mgaye.banking_application.service.UserDetailsServiceImpl;
 import com.mgaye.banking_application.service.UserService;
 import com.mgaye.banking_application.service.AuditService;
+import com.mgaye.banking_application.service.AuthenticationService;
+import com.mgaye.banking_application.service.MfaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,10 +41,16 @@ class AuthControllerTest {
     private UserDetailsServiceImpl userDetailsService;
 
     @MockBean
-    private JwtHelper jwtHelper;
+    private AuthenticationService authenticationService;
+
+    @MockBean
+    private MfaService mfaService;
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtHelper jwtHelper;
 
     @MockBean
     private AuditService auditService;
@@ -64,6 +73,14 @@ class AuthControllerTest {
         registrationDto.setPassword("Password@123");
         registrationDto.setFirstName("Test");
         registrationDto.setLastName("User");
+    }
+
+    @Test
+    public void testVerifyEmail() throws Exception {
+        mockMvc.perform(get("/api/auth/verify-email")
+                .param("token", "someVerificationToken"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("email-verification-success"));
     }
 
 }

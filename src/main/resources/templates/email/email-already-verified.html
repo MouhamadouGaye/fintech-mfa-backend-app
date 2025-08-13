@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Email Already Verified</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>✅ Already Verified</h1>
+    <p>
+      Your email is already verified,
+      <span th:text="${user != null ? user.firstName : 'User'}">User</span>.
+    </p>
+    <a href="/login">Go to Login</a>
+  </body>
+</html>

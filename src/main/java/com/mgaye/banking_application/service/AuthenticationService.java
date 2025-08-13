@@ -17,6 +17,7 @@ import com.mgaye.banking_application.dto.response.RegistrationResponse;
 import com.mgaye.banking_application.entity.AlertSeverity;
 import com.mgaye.banking_application.entity.AmlStatus;
 import com.mgaye.banking_application.entity.AuditAction;
+import com.mgaye.banking_application.entity.Role;
 import com.mgaye.banking_application.entity.SecurityAlertType;
 import com.mgaye.banking_application.entity.User;
 import com.mgaye.banking_application.entity.UserSession;
@@ -254,7 +255,9 @@ public class AuthenticationService {
     }
 
     // ✅ Registration with Email Verification
+    @Transactional
     public RegistrationResponse register(RegistrationRequest request, HttpServletRequest httpRequest) {
+
         String email = request.getEmail().toLowerCase().trim();
         String ipAddress = clientIpAddress.getClientIpAddress(httpRequest);
 
@@ -277,9 +280,11 @@ public class AuthenticationService {
                 .password(passwordService.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .username(request.getFirstName().trim() + "." + request.getLastName().trim())
                 .phoneNumber(request.getPhoneNumber())
                 .dateOfBirth(request.getDateOfBirth())
                 .nationalId(request.getNationalId())
+                .role(request.getRole())
                 .passwordLastChanged(LocalDateTime.now())
                 .passwordExpiresAt(LocalDateTime.now().plusDays(90))
                 .verificationToken(tokenService.generateVerificationToken(ipAddress))
@@ -287,10 +292,17 @@ public class AuthenticationService {
                 .createdBy("SYSTEM")
                 .build();
 
+        // // Send verification email
+        // emailService.sendVerificationEmail(user);
+
         userRepository.save(user);
 
-        // Send verification email
-        emailService.sendVerificationEmail(user);
+        try {
+            emailService.sendVerificationEmail(user);
+        } catch (Exception e) {
+            log.error("Failed to send verification email to: " + user.getEmail(), e);
+            // Optionally, you can still proceed or mark user as pending verification
+        }
 
         // Audit log
         auditService.log(AuditAction.USER_REGISTRATION, user, ipAddress, "User registered");

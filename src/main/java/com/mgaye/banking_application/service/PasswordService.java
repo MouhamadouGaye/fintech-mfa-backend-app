@@ -1,6 +1,7 @@
 package com.mgaye.banking_application.service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +38,7 @@ public class PasswordService {
         }
 
         if (!password.matches(".*[a-z].*")) {
-            throw new WeakPasswordException("Password must contain atwx least one lowercase letter");
+            throw new WeakPasswordException("Password must contain at least one lowercase letter");
         }
 
         if (!password.matches(".*\\d.*")) {

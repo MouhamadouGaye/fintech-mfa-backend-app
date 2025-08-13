@@ -21,7 +21,7 @@ spring:
 # this is
   redis.host: localhost
   redis.port: 6379
-  redis.password:
+  # redis.password: kobe-the-best-developer
     
   # h2:
   #   console:
@@ -48,14 +48,39 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
+    username: mgayeeeeee@gmail.com
+    password: fiwrnbmsnwpitzxq
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+  # mail:
+  #   host: ${MAIL_HOST}
+  #   port: ${MAIL_PORT:587}
+  #   username: ${MAIL_USERNAME}
+  #   password: ${MAIL_PASSWORD}
+  #   protocol: smtp
+  #   test-connection: false
+  #   default-encoding: UTF-8
+  #   properties:
+  #     mail:
+  #       smtp:
+  #         auth: true
+  #         starttls:
+  #           enable: true
+  #           required: true
+          # ssl:
+          #   trust: ${MAIL_HOST}
+          # connectiontimeout: 5000
+          # timeout: 3000
+          # writetimeout: 5000
+ 
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
 
 
 
@@ -66,8 +91,11 @@ app:
   jwtExpirationInMs: 900000 # 15 minutes
   jwtRefreshExpirationInMs: 604800000 # 7 days
 
-  frontend.url: http://localhost:8080
-  mail.from: mgayeeeeee@gmail.com
+  frontend:
+    url: http://localhost:8080/banking-api/api/auth
+  mail:
+    from: mgayeeeeee@gmail.com
+
     
 
 
@@ -114,6 +142,9 @@ banking:
   security:
     max-failed-attempts: 5
     account-lock-duration: 24 # hours
+
+
+
 
 
 

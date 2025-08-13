@@ -69,6 +69,8 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+
+
                 <!-- Redis support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -93,6 +95,13 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+
 
 
                 <!-- For Twilio SMS -->

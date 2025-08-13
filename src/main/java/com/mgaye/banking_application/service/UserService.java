@@ -15,6 +15,7 @@ import com.mgaye.banking_application.entity.Role;
 import com.mgaye.banking_application.entity.SecurityAlertType;
 import com.mgaye.banking_application.entity.TrustedDevice;
 import com.mgaye.banking_application.exception.AccountAlreadyVerifiedException;
+import com.mgaye.banking_application.exception.AlreadyVerifiedException;
 import com.mgaye.banking_application.exception.DeviceNotFoundException;
 import com.mgaye.banking_application.exception.InvalidTokenException;
 import com.mgaye.banking_application.exception.PasswordReusedException;
@@ -455,9 +456,58 @@ public class UserService {
         return UserResponseDto.fromUser(user);
     }
 
-    public void verifyEmail(String token, String ipAddress) {
+    // public User verifyEmail(String token, String ipAddress) {
+    // User user = userRepository.findByVerificationToken(token)
+    // .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
+
+    // if (user.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
+    // throw new TokenExpiredException("Verification token has expired");
+    // }
+
+    // user.setIsVerified(true);
+    // user.setVerificationToken(null);
+    // user.setVerificationTokenExpiry(null);
+    // userRepository.save(user);
+
+    // auditService.log(AuditAction.EMAIL_VERIFIED, user, ipAddress, "Email verified
+    // successfully");
+    // log.info("Email verified for user: {}", user.getEmail());
+
+    // return user;
+    // }
+
+    // public User verifyEmail(String token, String ipAddress) {
+    // User user = userRepository.findByVerificationToken(token)
+    // .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
+
+    // // ✅ Add this early exit
+    // if (user.getIsVerified()) {
+    // return user; // Already verified — skip updates
+    // }
+
+    // if (user.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
+    // throw new TokenExpiredException("Verification token has expired");
+    // }
+
+    // user.setIsVerified(true);
+    // user.setVerificationToken(null);
+    // user.setVerificationTokenExpiry(null);
+    // userRepository.save(user);
+
+    // auditService.log(AuditAction.EMAIL_VERIFIED, user, ipAddress, "Email verified
+    // successfully");
+    // log.info("Email verified for user: {}", user.getEmail());
+
+    // return user;
+    // }
+
+    public User verifyEmail(String token, String ipAddress) {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
+
+        if (Boolean.TRUE.equals(user.getIsVerified())) {
+            throw new AlreadyVerifiedException("This email is already verified.");
+        }
 
         if (user.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
             throw new TokenExpiredException("Verification token has expired");
@@ -470,6 +520,8 @@ public class UserService {
 
         auditService.log(AuditAction.EMAIL_VERIFIED, user, ipAddress, "Email verified successfully");
         log.info("Email verified for user: {}", user.getEmail());
+
+        return user;
     }
 
     public void initiatePasswordReset(String email, String ipAddress) {
@@ -743,4 +795,18 @@ public class UserService {
                 .blocked(attempt.getBlocked())
                 .build();
     }
+
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        // Optional: Check any business rules before deleting user (e.g. can't delete
+        // admin)
+
+        userRepository.delete(user);
+
+        auditService.log(AuditAction.USER_DELETION, user, "SYSTEM", "User deleted by admin");
+    }
+
 }

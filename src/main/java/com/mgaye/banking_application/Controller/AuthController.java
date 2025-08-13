@@ -481,9 +481,14 @@ import com.mgaye.banking_application.dto.response.MessageResponse;
 import com.mgaye.banking_application.dto.response.MfaSetupResponse;
 import com.mgaye.banking_application.dto.response.RegistrationResponse;
 import com.mgaye.banking_application.entity.User;
+import com.mgaye.banking_application.exception.AccountAlreadyVerifiedException;
+import com.mgaye.banking_application.exception.AlreadyVerifiedException;
+import com.mgaye.banking_application.exception.InvalidTokenException;
+import com.mgaye.banking_application.exception.TokenExpiredException;
 import com.mgaye.banking_application.security.JwtHelper;
 import com.mgaye.banking_application.service.UserDetailsServiceImpl;
 import com.mgaye.banking_application.service.UserDetailsServiceImpl.UserDetailsImpl;
+
 import com.mgaye.banking_application.service.UserService;
 import com.mgaye.banking_application.service.AuditService;
 import com.mgaye.banking_application.service.AuthenticationService;
@@ -509,10 +514,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/api/auth")
 @Validated
 @Slf4j
@@ -522,6 +529,45 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final MfaService mfaService;
     private final UserService userService;
+
+    // @GetMapping("/verify-email")
+    // public String verifyEmail(@RequestParam String token, HttpServletRequest
+    // request, Model model) {
+    // // 1. validate the token (check if valid, not expired, etc.)
+    // // 2. activate the user account or mark email as verified
+    // String ipAddress = request.getRemoteAddr();
+
+    // User user = userService.verifyEmail(token, ipAddress);
+    // // Add any model attributes needed by the template
+    // // model.addAttribute("user", user);
+    // // 3. return a Thymeleaf template like "email-verification-success.html"
+
+    // if (user.getIsVerified()) {
+    // model.addAttribute("user", user);
+    // }
+    // return "email/email-verification";
+    // }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam String token, HttpServletRequest request, Model model) {
+        String ipAddress = request.getRemoteAddr();
+
+        try {
+            User user = userService.verifyEmail(token, ipAddress);
+            model.addAttribute("user", user);
+            model.addAttribute("message", "Your email has been successfully verified!");
+            return "email/email-verification-success"; // ✅ success page
+        } catch (AlreadyVerifiedException e) {
+            model.addAttribute("message", "Your email is already verified.");
+            return "email/email-already-verified"; // ✅ already verified page
+        } catch (TokenExpiredException e) {
+            model.addAttribute("message", "Your verification link has expired. Please request a new one.");
+            return "email/email-verification-expired"; // ✅ expired page
+        } catch (InvalidTokenException e) {
+            model.addAttribute("message", "Invalid verification link.");
+            return "email/email-verification-error"; // ✅ invalid page
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(

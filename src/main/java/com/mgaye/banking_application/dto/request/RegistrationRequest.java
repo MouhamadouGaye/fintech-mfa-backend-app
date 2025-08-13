@@ -2,6 +2,8 @@ package com.mgaye.banking_application.dto.request;
 
 import java.time.LocalDate;
 
+import com.mgaye.banking_application.entity.Role;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -50,4 +52,7 @@ public class RegistrationRequest {
 
     @AssertTrue(message = "You must accept the privacy policy")
     private Boolean acceptPrivacy;
+
+    private Role role; // optional, be careful!
+
 }
