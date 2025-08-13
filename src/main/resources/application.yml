@@ -21,7 +21,7 @@ spring:
 # this is
   redis.host: localhost
   redis.port: 6379
-  # redis.password: kobe-the-best-developer
+  redis.password: Kobe-the-best-developer
     
   # h2:
   #   console:
