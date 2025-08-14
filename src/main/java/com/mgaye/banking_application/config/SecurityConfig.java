@@ -174,7 +174,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/home", "/api/auth/login", "/api/auth/register", "/api/auth/verify-email")
+                        .requestMatchers("/home", "/api/auth/login", "/api/auth/register", "/api/auth/verify-email",
+                                "/api/auth/ameth")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/compliance/**").hasRole("COMPLIANCE_OFFICER")

@@ -46,7 +46,7 @@ public class UserDto {
                 .phoneNumber(user.getPhoneNumber())
                 .dateOfBirth(user.getDateOfBirth())
                 .role(user.getRole())
-                .isActive(user.getIsActive())
+                .isActive(user.getRole().name() == "ADMIN" ? user.getIsActive() : false)
                 .isVerified(user.getIsVerified())
                 .isMfaEnabled(user.getIsMfaEnabled())
                 .kycStatus(user.getKycStatus())

@@ -548,6 +548,13 @@ public class AuthController {
     // return "email/email-verification";
     // }
 
+    @GetMapping("ameth")
+    public String amethEndpoint(Model model) {
+        model.addAttribute("nom", "Mouhamadou GAYE");
+        return "kobe";
+
+    }
+
     @GetMapping("/verify-email")
     public String verifyEmail(@RequestParam String token, HttpServletRequest request, Model model) {
         String ipAddress = request.getRemoteAddr();

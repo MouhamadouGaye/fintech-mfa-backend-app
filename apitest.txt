@@ -6,6 +6,13 @@ curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
   }'
 
 
+curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "ardo.ciseaux@gmail.com",
+    "password": "Ardo@123"
+  }'
+
 
 {"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDgyNTkzNiwiZXhwIjoxNzU0ODI2ODM2LCJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsInRva2VuVHlwZSI6IkFDQ0VTUyJ9.isd60pRWz3-568JtyaVsQDCFWNhKjUUiNyzn7VCMG4M",
 "refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDgyNTkzNiwiZXhwIjoxNzU1NDMwNzM2LCJ1c2VySWQiOjEsInRva2VuVHlwZSI6IlJFRlJFU0gifQ.Om_C7AyvgVOgmtM4NPK5jobIncsfvnwc2Be_52vEbrk",
@@ -37,27 +44,27 @@ curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
   }%  
 
 
-  curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
+curl -X POST 'http://localhost:8080/banking-api/api/auth/login' \
   -H 'Content-Type: application/json' \
   -d '{
     "email": "mouhamadou.gayz@gmail.com",
     "password": "Mouhamadou@123"
   }'
-
-
+{"accessToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb3VoYW1hZG91LmdheXpAZ21haWwuY29tIiwiaWF0IjoxNzU1MDQ3NzMwLCJleHAiOjE3NTUwNDg2MzAsInVzZXJJZCI6NSwicm9sZSI6IkFETUlOIiwidG9rZW5UeXBlIjoiQUNDRVNTIn0.wZn9zPfyUB_Y7_CRxHFt32-JdRu3ZmdHpuxFWykWPvs",
+"refreshToken":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb3VoYW1hZG91LmdheXpAZ21haWwuY29tIiwiaWF0IjoxNzU1MDQ3NzMwLCJleHAiOjE3NTU2NTI1MzAsInVzZXJJZCI6NSwidG9rZW5UeXBlIjoiUkVGUkVTSCJ9.WklnioQy-6lQnNrWq0rYx3k_UIor4OQ1-DZctQo8P1E","user":{"id":5,"username":null,"email":"mouhamadou.gayz@gmail.com","firstName":"Mouhamadou","lastName":"GAYE","phoneNumber":"1234577770","dateOfBirth":"2004-01-01","role":"ADMIN","isActive":true,"isVerified":true,"isMfaEnabled":false,"kycStatus":"PENDING","riskLevel":"LOW","lastLoginAt":"2025-08-13T03:15:30.333057","lastLoginIp":"0:0:0:0:0:0:0:1","createdAt":"2025-08-13T00:45:25.024454","passwordLastChanged":"2025-08-13T00:45:24.990471","requiresPasswordChange":false},"expiresIn":900,"tokenType":null,"requiresMfa":null,"requiresDeviceVerification":null,"requiresPasswordChange":null,"message":"Authentication successful}
 
 curl -X POST http://localhost:8080/banking-api/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "mouhamadou.gayz@gmail.com",
-    "firstName": "Mouhamadou",
-    "lastName": "GAYE",
-    "password": "Mouhamadou@123",
-    "phoneNumber": "1234577770",
+    "email": "ardo.ciseaux@gmail.com",
+    "firstName": "Ardo",
+    "lastName": "Ciseaux",
+    "password": "Ardo@123",
+    "phoneNumber": "459887889",
     "address": "123 Main St",
     "dateOfBirth": "2004-01-01",
-    "role": "ADMIN",
-    "nationalId": "1823456789",
+    "role": "CUSTOMER",
+    "nationalId": "1989349999",
     "acceptTerms": true,
     "acceptPrivacy": true
   }'
@@ -133,6 +140,6 @@ curl -X POST http://localhost:8080/banking-api/api/auth/register \
   }'
 
 
-curl -X POST http://localhost:8080/banking-api/api/auth/logout \
-  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc1NDMxNDE5OSwiZXhwIjoxNzU0MzMyMTk5fQ.X37iW0MLMez2T20fOobjK5_lhSnbZ2e2LZyydiWsuK4dbrVrfB_Kj0XDnQt8UNACp8pDzptZmPjgDiUbQwqkxw" \
+curl -X POST http://localhost:8080/banking-api/api/admin/users/1234567890 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtb3VoYW1hZG91LmdheXpAZ21haWwuY29tIiwiaWF0IjoxNzU1MDQ3NzMwLCJleHAiOjE3NTUwNDg2MzAsInVzZXJJZCI6NSwicm9sZSI6IkFETUlOIiwidG9rZW5UeXBlIjoiQUNDRVNTIn0.wZn9zPfyUB_Y7_CRxHFt32-JdRu3ZmdHpuxFWykWPvs" \
   -H "Content-Type: application/json"
